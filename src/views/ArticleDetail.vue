@@ -60,8 +60,8 @@
           </div>
         </div>
         <div>
-         <v-md-editor v-model="state.markContent" height="400px" v-if="state.editting"></v-md-editor>
-         <v-md-editor v-model="state.markContent" height="400px" v-if="!state.editting"  mode="preview"></v-md-editor>
+         <v-md-editor v-model="state.markContent" height="600px" v-if="state.editting"></v-md-editor>
+         <v-md-editor v-model="state.markContent" height="600px" v-if="!state.editting"  mode="preview" :include-level="[3, 4]"></v-md-editor>
         </div>
         <div class="heart">
           <el-button
@@ -124,12 +124,46 @@ import {
   ArticleDetailParams,
 } from "../types/index";
 
-import VMdEditor from '@kangc/v-md-editor';
-import '@kangc/v-md-editor/lib/style/base-editor.css';
+import VMdEditor from '@kangc/v-md-editor/lib/codemirror-editor';
+import '@kangc/v-md-editor/lib/style/codemirror-editor.css';
 import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
 import '@kangc/v-md-editor/lib/theme/style/github.css';
 
-VMdEditor.use(githubTheme);
+// highlightjs
+import hljs from 'highlight.js';
+
+// codemirror 编辑器的相关资源
+import Codemirror from 'codemirror';
+// mode
+import 'codemirror/mode/markdown/markdown';
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/css/css';
+import 'codemirror/mode/htmlmixed/htmlmixed';
+import 'codemirror/mode/vue/vue';
+// edit
+import 'codemirror/addon/edit/closebrackets';
+import 'codemirror/addon/edit/closetag';
+import 'codemirror/addon/edit/matchbrackets';
+// placeholder
+import 'codemirror/addon/display/placeholder';
+// active-line
+import 'codemirror/addon/selection/active-line';
+// scrollbar
+import 'codemirror/addon/scroll/simplescrollbars';
+import 'codemirror/addon/scroll/simplescrollbars.css';
+// style
+import 'codemirror/lib/codemirror.css';
+
+VMdEditor.Codemirror = Codemirror;
+VMdEditor.use(githubTheme, {
+  Hljs: hljs,
+  config: {
+    toc: {
+      includeLevel: [3, 4],
+    },
+  },
+});
+
 
 declare let document: Document | any;
 
@@ -146,7 +180,7 @@ export default defineComponent({
       isLoadEnd: false,
       isLoading: false,
       editting : true, // 正在编辑
-      markContent: "# 1 test",
+      markContent: "## 2 test",
       isMobileOrPc: isMobileOrPc(),
       params: {
         id: "",
