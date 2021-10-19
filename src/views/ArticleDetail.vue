@@ -3,22 +3,22 @@
     <div class="article clearfix">
       <div
         v-show="!state.isLoading"
-        :style="{'width': state.isMobileOrPc ? '100%' : '75%'}"
+        :style="{ width: state.isMobileOrPc ? '100%' : '75%' }"
         class="article-left fl"
       >
         <div class="header">
-          <h1 class="title">{{state.articleDetail.title}}</h1>
+          <h1 class="title">{{ state.articleDetail.title }}</h1>
           <div class="author">
             <div class="avatar">
               <img
                 class="auth-logo"
                 src="../assets/userLogo.jpeg"
-                alt="BiaoChenXuYing"
-              >
+                alt="blakeyi"
+              />
             </div>
             <div class="info">
               <span class="name">
-                <span>{{state.articleDetail.author}}</span>
+                <span>{{ state.articleDetail.author }}</span>
               </span>
               <div
                 props-data-classes="user-follow-button-header"
@@ -26,44 +26,42 @@
               />
               <div class="meta">
                 <span class="publish-time">
-                  {{state.articleDetail.create_time? formatTime(state.articleDetail.create_time): ''}}
+                  {{
+                    state.articleDetail.create_time
+                      ? formatTime(state.articleDetail.create_time)
+                      : ""
+                  }}
                 </span>
                 <span class="wordage">
-                  字数 {{state.articleDetail.numbers}}
+                  字数 {{ state.articleDetail.numbers }}
                 </span>
                 <span class="views-count">
-                  阅读 {{state.articleDetail.meta.views}}
+                  阅读 {{ state.articleDetail.meta.views }}
                 </span>
                 <span class="comments-count">
-                  评论 {{state.articleDetail.meta.comments}}
+                  评论 {{ state.articleDetail.meta.comments }}
                 </span>
                 <span class="likes-count">
-                  喜欢 {{state.articleDetail.meta.likes}}
+                  喜欢 {{ state.articleDetail.meta.likes }}
                 </span>
               </div>
             </div>
-            <div
-              class="tags "
-              title="标签"
-            >
+            <div class="tags" title="标签">
               <el-tag
                 size="mini"
                 v-for="tag in state.articleDetail.tags"
                 :key="tag._id"
                 class="tag"
                 type="success"
-              >{{tag.name}}</el-tag>
+                >{{ tag.name }}</el-tag
+              >
             </div>
             <span class="clearfix" />
           </div>
         </div>
-        <div class="content">
-          <div
-            id="content"
-            class="article-detail"
-            v-html="state.articleDetail.content"
-          >
-          </div>
+        <div>
+         <v-md-editor v-model="state.markContent" height="400px" v-if="state.editting"></v-md-editor>
+         <v-md-editor v-model="state.markContent" height="400px" v-if="!state.editting"  mode="preview"></v-md-editor>
         </div>
         <div class="heart">
           <el-button
@@ -87,7 +85,8 @@
             type="primary"
             :loading="state.btnLoading"
             @click="handleAddComment"
-          >发 送</el-button>
+            >发 送</el-button
+          >
         </div>
         <CommentList
           v-if="!state.isLoading"
@@ -107,6 +106,8 @@
     </div>
   </div>
 </template>
+
+
 <script lang="ts">
 import { defineComponent, reactive, onMounted } from "vue";
 import service from "../utils/https";
@@ -123,6 +124,13 @@ import {
   ArticleDetailParams,
 } from "../types/index";
 
+import VMdEditor from '@kangc/v-md-editor';
+import '@kangc/v-md-editor/lib/style/base-editor.css';
+import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
+import '@kangc/v-md-editor/lib/theme/style/github.css';
+
+VMdEditor.use(githubTheme);
+
 declare let document: Document | any;
 
 export default defineComponent({
@@ -130,12 +138,15 @@ export default defineComponent({
   components: {
     LoadingCustom,
     CommentList,
+    VMdEditor,
   },
   setup() {
     const state = reactive({
       btnLoading: false,
       isLoadEnd: false,
       isLoading: false,
+      editting : true, // 正在编辑
+      markContent: "# 1 test",
       isMobileOrPc: isMobileOrPc(),
       params: {
         id: "",
@@ -145,7 +156,7 @@ export default defineComponent({
       articleDetail: {
         toc: "",
         _id: "",
-        author: "biaochenxuying",
+        author: "blakeyi",
         category: [],
         comments: [],
         create_time: "",
@@ -156,7 +167,7 @@ export default defineComponent({
         numbers: 0,
         keyword: [],
         like_users: [],
-        meta: { views: 0, likes: 0, comments: 0 },
+        meta: { views: 1, likes: 0, comments: 0 },
         origin: 0,
         state: 1,
         tags: [],
@@ -173,16 +184,27 @@ export default defineComponent({
     };
 
     const handleSearch = async (): Promise<void> => {
+      console.log(urls.getArticleDetail);
+      console.log(state.params);
       state.isLoading = true;
-      const data: any = await service.post(urls.getArticleDetail, state.params);
+      //const data: any = await service.post(urls.getArticleDetail, state.params);
       state.isLoading = false;
-
+      var data = {
+        content: "# hello `java` ",
+        keyword: ["test"],
+        desc: "hell0",
+        title: "blakeyi",
+      };
       state.articleDetail = data;
+
       const article = markdown.marked(data.content);
       article.then((res: any) => {
-        state.articleDetail.content = res.content;
+        //state.articleDetail.content = res.content;
+        state.articleDetail.content = "<h1>这是一个h1元素内容</h1>";
         state.articleDetail.toc = res.toc;
       });
+      state.articleDetail.content = "<h1>这是一个h1元素内容</h1>";
+      console.log(state.articleDetail.content);
       let keyword = data.keyword.join(",");
       let description = data.desc;
       let title = data.title;

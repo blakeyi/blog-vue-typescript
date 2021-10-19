@@ -94,7 +94,7 @@ const lazyload = throttle(() => {
 }, 1000);
 
 export default defineComponent({
-  name: "Articles",
+  name: "ArticleCreate",
   components: {
     LoadEnd,
     LoadingCustom,
@@ -126,11 +126,11 @@ export default defineComponent({
       } as ArticlesParams,
       href:
         import.meta.env.MODE === "development"
-          ? "http://localhost:3001/articleDetail?article_id="
+          ? "http://blakeyi.cn/articleDetail?article_id="
           : "http://blakeyi.cn/articleDetail?article_id=",
       href1:
         import.meta.env.MODE === "development"
-          ? "http://localhost:3001/articleCreate"
+          ? "http://blakeyi.cn/articleCreate"
           : "http://blakeyi.cn/articleCreate",
     });
 
