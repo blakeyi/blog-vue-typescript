@@ -44,6 +44,12 @@
                 <span class="likes-count">
                   喜欢 {{ state.articleDetail.meta.likes }}
                 </span>
+                <el-button
+                  type="small"
+                  :loading="state.btnLoading"
+                  @click="editting=!editting"
+                  >编辑</el-button
+                >
               </div>
             </div>
             <div class="tags" title="标签">
@@ -60,8 +66,18 @@
           </div>
         </div>
         <div>
-         <v-md-editor v-model="state.markContent" height="600px" v-if="state.editting"></v-md-editor>
-         <v-md-editor v-model="state.markContent" height="600px" v-if="!state.editting"  mode="preview" :include-level="[3, 4]"></v-md-editor>
+          <v-md-editor
+            v-model="state.markContent"
+            height="600px"
+            v-show="editting"
+          ></v-md-editor>
+          <v-md-editor
+            v-model="state.markContent"
+            height="600px"
+            v-show="!editting"
+            mode="preview"
+            :include-level="[3, 4]"
+          ></v-md-editor>
         </div>
         <div class="heart">
           <el-button
@@ -109,7 +125,7 @@
 
 
 <script lang="ts">
-import { defineComponent, reactive, onMounted } from "vue";
+import { defineComponent, reactive, onMounted, ref } from "vue";
 import service from "../utils/https";
 import urls from "../utils/urls";
 import { ElMessage } from "element-plus";
@@ -124,35 +140,35 @@ import {
   ArticleDetailParams,
 } from "../types/index";
 
-import VMdEditor from '@kangc/v-md-editor/lib/codemirror-editor';
-import '@kangc/v-md-editor/lib/style/codemirror-editor.css';
-import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
-import '@kangc/v-md-editor/lib/theme/style/github.css';
+import VMdEditor from "@kangc/v-md-editor/lib/codemirror-editor";
+import "@kangc/v-md-editor/lib/style/codemirror-editor.css";
+import githubTheme from "@kangc/v-md-editor/lib/theme/github.js";
+import "@kangc/v-md-editor/lib/theme/style/github.css";
 
 // highlightjs
-import hljs from 'highlight.js';
+import hljs from "highlight.js";
 
 // codemirror 编辑器的相关资源
-import Codemirror from 'codemirror';
+import Codemirror from "codemirror";
 // mode
-import 'codemirror/mode/markdown/markdown';
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/mode/css/css';
-import 'codemirror/mode/htmlmixed/htmlmixed';
-import 'codemirror/mode/vue/vue';
+import "codemirror/mode/markdown/markdown";
+import "codemirror/mode/javascript/javascript";
+import "codemirror/mode/css/css";
+import "codemirror/mode/htmlmixed/htmlmixed";
+import "codemirror/mode/vue/vue";
 // edit
-import 'codemirror/addon/edit/closebrackets';
-import 'codemirror/addon/edit/closetag';
-import 'codemirror/addon/edit/matchbrackets';
+import "codemirror/addon/edit/closebrackets";
+import "codemirror/addon/edit/closetag";
+import "codemirror/addon/edit/matchbrackets";
 // placeholder
-import 'codemirror/addon/display/placeholder';
+import "codemirror/addon/display/placeholder";
 // active-line
-import 'codemirror/addon/selection/active-line';
+import "codemirror/addon/selection/active-line";
 // scrollbar
-import 'codemirror/addon/scroll/simplescrollbars';
-import 'codemirror/addon/scroll/simplescrollbars.css';
+import "codemirror/addon/scroll/simplescrollbars";
+import "codemirror/addon/scroll/simplescrollbars.css";
 // style
-import 'codemirror/lib/codemirror.css';
+import "codemirror/lib/codemirror.css";
 
 VMdEditor.Codemirror = Codemirror;
 VMdEditor.use(githubTheme, {
@@ -164,7 +180,6 @@ VMdEditor.use(githubTheme, {
   },
 });
 
-
 declare let document: Document | any;
 
 export default defineComponent({
@@ -174,12 +189,23 @@ export default defineComponent({
     CommentList,
     VMdEditor,
   },
+  data() {
+    return {
+      editting:true
+    }
+    
+  },
+  methods:{
+    startEdit () {
+      console.log(this.editting)
+      this.editting = false
+    },
+  },
   setup() {
     const state = reactive({
       btnLoading: false,
       isLoadEnd: false,
       isLoading: false,
-      editting : true, // 正在编辑
       markContent: "## 2 test",
       isMobileOrPc: isMobileOrPc(),
       params: {

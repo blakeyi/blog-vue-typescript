@@ -1,5 +1,5 @@
 <template>
-  <div class="left clearfix">
+  <div class="left">
     <el-input
       v-model="state.searchInput"
       placeholder="请输入文章标题"
@@ -8,7 +8,8 @@
     />
     <el-button type="primary" icon="el-icon-plus">保存草稿</el-button>
     <el-button type="primary" icon="el-icon-plus">发布文章</el-button>
-    <v-md-editor v-model="state.markContent" height="600px" v-if="state.editting" style="margin-top: 10px"></v-md-editor>
+    <v-md-editor v-model="state.markContent" height="600px" v-if="state.editting" style="margin-top: 300px"></v-md-editor>
+    
   </div>
 </template>
 

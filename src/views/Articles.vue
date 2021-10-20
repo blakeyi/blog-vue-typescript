@@ -3,16 +3,25 @@
     <h3 v-if="state.params.tag_id" class="left-title">
       {{ state.tag_name }} 相关的文章：
     </h3>
-    <el-input
-      v-model="state.searchInput"
-      placeholder="关键字"
-      prefix-icon="el-icon-search"
-      style="width:35%"
-    />
-    <el-button type="primary" icon="el-icon-search">搜索文章</el-button>
-    <a :href="state.href1" target="_blank">
-    <el-button type="primary" icon="el-icon-plus">新增文章</el-button>
-    </a>
+
+    <el-row :gutter="20">
+      <el-col :span="10"
+        ><el-input
+          v-model="state.searchInput"
+          placeholder="关键字"
+          prefix-icon="el-icon-search"
+          style="width: 100%"
+      /></el-col>
+      <el-col :span="6"   
+        ><el-button type="primary" icon="el-icon-search"
+          >搜索文章</el-button
+        ></el-col
+      >
+      <el-col :span="6"><a :href="state.href1" target="_blank">
+          <el-button type="primary" icon="el-icon-plus">新增文章</el-button>
+        </a></el-col>
+    </el-row>
+    
     <ul class="articles-list" id="list">
       <transition-group name="el-fade-in">
         <li
@@ -32,7 +41,7 @@
               <h4 class="title">{{ article.title }}</h4>
               <p class="abstract">{{ article.desc }}</p>
               <div class="meta">
-                <span>查看 {{ article.meta.views }}</span>
+                <span>阅读 {{ article.meta.views }}</span>
                 <span>评论 {{ article.meta.comments }}</span>
                 <span>赞 {{ article.meta.likes }}</span>
                 <span v-if="article.create_time" class="time">
@@ -111,7 +120,7 @@ export default defineComponent({
     const state = reactive({
       isLoadEnd: false,
       isLoading: false,
-      searchInput:"",
+      searchInput: "",
       articlesList: [] as Array<any>,
       total: 0,
       tag_name: decodeURI(getQueryStringByName("tag_name")),
@@ -166,21 +175,22 @@ export default defineComponent({
       //   .catch(function (error) {
       //     alert(error);
       //   });
-          state.isLoading = false;
-          var data = {
-            title:"article1",
-            _id : 123,
-            desc : "123",
-            meta :{
-              views:123,
-              comments:123,
-              likes:123,
-            },
-          }
-          state.articlesList = [...state.articlesList, data];
-          state.articlesList = [...state.articlesList, data];
-          state.total = 2;
-          state.params.pageNum++;
+      state.isLoading = false;
+      var data = {
+        title: "article1",
+        _id: 123,
+        desc: "123",
+        meta: {
+          views: 123,
+          comments: 123,
+          likes: 123,
+        },
+        create_time:Date.now(),
+      };
+      state.articlesList = [...state.articlesList, data];
+      state.articlesList = [...state.articlesList, data];
+      state.total = 2;
+      state.params.pageNum++;
     };
 
     const routeChange = (val: any, oldVal: any): void => {
@@ -292,5 +302,30 @@ export default defineComponent({
     }
   }
 }
-
+.el-row {
+  margin-bottom: 20px;
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+.el-col {
+  border-radius: 4px;
+}
+.bg-purple-dark {
+  background: #99a9bf;
+}
+.bg-purple {
+  background: #d3dce6;
+}
+.bg-purple-light {
+  background: #e5e9f2;
+}
+.grid-content {
+  border-radius: 4px;
+  min-height: 36px;
+}
+.row-bg {
+  padding: 10px 0;
+  background-color: #f9fafc;
+}
 </style>
