@@ -1,124 +1,67 @@
 <template>
   <div style="width: 100%">
-    <div class="article clearfix">
-      <div
-        v-show="!state.isLoading"
-        :style="{ width: state.isMobileOrPc ? '100%' : '75%' }"
-        class="article-left fl"
-      >
-        <div class="header">
-          <h1 class="title">{{ state.articleDetail.title }}</h1>
-          <div class="author">
-            <div class="avatar">
-              <img
-                class="auth-logo"
-                src="../assets/userLogo.jpeg"
-                alt="blakeyi"
-              />
-            </div>
-            <div class="info">
-              <span class="name">
-                <span>{{ state.articleDetail.author }}</span>
+    <div class="article">
+      <div class="header">
+        <h1 class="title">{{ state.articleDetail.title }}</h1>
+        <div class="author">
+          <div class="avatar">
+            <img
+              class="auth-logo"
+              src="../assets/userLogo.jpeg"
+              alt="blakeyi"
+            />
+          </div>
+          <div class="info">
+            <span class="name">
+              <span>{{ state.articleDetail.author }}</span>
+            </span>
+            <div
+              props-data-classes="user-follow-button-header"
+              data-author-follow-button=""
+            />
+            <div class="meta">
+              <span class="publish-time">
+                {{
+                  state.articleDetail.create_time
+                    ? formatTime(state.articleDetail.create_time)
+                    : ""
+                }}
               </span>
-              <div
-                props-data-classes="user-follow-button-header"
-                data-author-follow-button=""
-              />
-              <div class="meta">
-                <span class="publish-time">
-                  {{
-                    state.articleDetail.create_time
-                      ? formatTime(state.articleDetail.create_time)
-                      : ""
-                  }}
-                </span>
-                <span class="wordage">
-                  字数 {{ state.articleDetail.numbers }}
-                </span>
-                <span class="views-count">
-                  阅读 {{ state.articleDetail.meta.views }}
-                </span>
-                <span class="comments-count">
-                  评论 {{ state.articleDetail.meta.comments }}
-                </span>
-                <span class="likes-count">
-                  喜欢 {{ state.articleDetail.meta.likes }}
-                </span>
-                <el-button
-                  type="small"
-                  :loading="state.btnLoading"
-                  @click="editting=!editting"
-                  >编辑</el-button
-                >
-              </div>
-            </div>
-            <div class="tags" title="标签">
-              <el-tag
-                size="mini"
-                v-for="tag in state.articleDetail.tags"
-                :key="tag._id"
-                class="tag"
-                type="success"
-                >{{ tag.name }}</el-tag
+              <span class="wordage">
+                字数 {{ state.articleDetail.numbers }}
+              </span>
+              <span class="views-count">
+                阅读 {{ state.articleDetail.meta.views }}
+              </span>
+              <span class="comments-count">
+                评论 {{ state.articleDetail.meta.comments }}
+              </span>
+              <span class="likes-count">
+                喜欢 {{ state.articleDetail.meta.likes }}
+              </span>
+              <el-button
+                type="small"
+                :loading="state.btnLoading"
+                @click="changeMyCount()"
+                >编辑</el-button
               >
             </div>
-            <span class="clearfix" />
           </div>
         </div>
-        <div>
+      </div>
+      <div>
+        <div v-if="mycount == 2">
+          <v-md-editor v-model="state.markContent" height="600px"></v-md-editor>
+        </div>
+        <div v-if="mycount == 1">
           <v-md-editor
             v-model="state.markContent"
             height="600px"
-            v-show="editting"
-          ></v-md-editor>
-          <v-md-editor
-            v-model="state.markContent"
-            height="600px"
-            v-show="!editting"
             mode="preview"
             :include-level="[3, 4]"
           ></v-md-editor>
         </div>
-        <div class="heart">
-          <el-button
-            type="danger"
-            size="large"
-            icon="heart"
-            :loading="state.isLoading"
-            @click="likeArticle"
-          >
-            点赞
-          </el-button>
-        </div>
-        <div class="comment">
-          <el-input
-            placeholder="文明社会，理性评论"
-            type="textarea"
-            v-model="state.content"
-          ></el-input>
-          <el-button
-            style="margin-top: 15px"
-            type="primary"
-            :loading="state.btnLoading"
-            @click="handleAddComment"
-            >发 送</el-button
-          >
-        </div>
-        <CommentList
-          v-if="!state.isLoading"
-          :numbers="state.articleDetail.meta.comments"
-          :list="state.articleDetail.comments"
-          :article_id="state.articleDetail._id"
-          @refreshArticle="refreshArticle"
-        />
       </div>
-      <div
-        v-if="!state.isMobileOrPc"
-        style="width: 23%"
-        class="article-right fr anchor"
-        v-html="state.articleDetail.toc"
-      ></div>
-      <LoadingCustom v-if="state.isLoading"></LoadingCustom>
     </div>
   </div>
 </template>
@@ -191,17 +134,17 @@ export default defineComponent({
   },
   data() {
     return {
-      editting:true
-    }
-    
+      editting: true,
+    };
   },
-  methods:{
-    startEdit () {
-      console.log(this.editting)
-      this.editting = false
+  methods: {
+    startEdit() {
+      console.log(this.editting);
+      this.editting = !this.editting;
     },
   },
   setup() {
+    let text = ref(2);
     const state = reactive({
       btnLoading: false,
       isLoadEnd: false,
@@ -393,6 +336,23 @@ export default defineComponent({
       }
       handleSearch();
     });
+    function handleEdit() {
+      console.log(text.value);
+      state.markContent = "11";
+      if (text.value == 1) {
+        text.value = 2;
+      } else {
+        text.value = 1;
+      }
+    }
+    const mycount = ref(2);
+    const changeMyCount = () => {
+      if (mycount.value == 1) {
+        mycount.value = 2;
+      } else {
+        mycount.value = 1;
+      }
+    };
 
     return {
       state,
@@ -401,6 +361,10 @@ export default defineComponent({
       handleAddComment,
       likeArticle,
       refreshArticle,
+      handleEdit,
+      text,
+      mycount,
+      changeMyCount,
     };
   },
   beforeUnmount(): void {
