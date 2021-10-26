@@ -26,10 +26,10 @@
       <transition-group name="el-fade-in">
         <li
           v-for="article in state.articlesList"
-          :key="article._id"
+          :key="article.id"
           class="item"
         >
-          <a :href="state.href + article._id" target="_blank">
+          <a :href="state.href + article.id" target="_blank">
             <img
               class="wrap-img img-blur-done"
               data-src="../assets/bg.jpg"
@@ -148,49 +148,49 @@ export default defineComponent({
     };
 
     const handleSearch = async (): Promise<void> => {
-      // axios
-      //   .get(urls.getArticleList, {
-      //     params: state.params,
-      //   })
-      //   .then(function (response) {
-      //     console.log(response);
-      //     var data = response.data;
-      //     state.isLoading = false;
-      //     state.articlesList = [...state.articlesList, ...data.list];
-      //     state.total = data.Count;
-      //     state.params.pageNum++;
-      //     nextTick(() => {
-      //       lazyload();
-      //     });
-      //     console.log("data:", data);
-      //     if (
-      //       data.list.length === 0 ||
-      //       state.total === state.articlesList.length
-      //     ) {
-      //       state.isLoadEnd = true;
-      //       document.removeEventListener("scroll", () => {});
-      //       window.onscroll = null;
-      //     }
-      //   })
-      //   .catch(function (error) {
-      //     alert(error);
-      //   });
-      state.isLoading = false;
-      var data = {
-        title: "article1",
-        _id: 123,
-        desc: "123",
-        meta: {
-          views: 123,
-          comments: 123,
-          likes: 123,
-        },
-        create_time:Date.now(),
-      };
-      state.articlesList = [...state.articlesList, data];
-      state.articlesList = [...state.articlesList, data];
-      state.total = 2;
-      state.params.pageNum++;
+      axios
+        .post("http://blakeyi.cn/getArticleList", {
+          params: state.params,
+        })
+        .then(function (response) {
+          console.log(response);
+          var data = response.data;
+          state.isLoading = false;
+          state.articlesList = [...state.articlesList, ...data.list];
+          state.total = data.Count;
+          state.params.pageNum++;
+          nextTick(() => {
+            lazyload();
+          });
+          console.log("data:", data);
+          if (
+            data.list.length === 0 ||
+            state.total === state.articlesList.length
+          ) {
+            state.isLoadEnd = true;
+            document.removeEventListener("scroll", () => {});
+            window.onscroll = null;
+          }
+        })
+        .catch(function (error) {
+          alert(error);
+        });
+      // state.isLoading = false;
+      // var data = {
+      //   title: "article1",
+      //   id: 123,
+      //   desc: "123",
+      //   meta: {
+      //     views: 123,
+      //     comments: 123,
+      //     likes: 123,
+      //   },
+      //   create_time:Date.now(),
+      // };
+      // state.articlesList = [...state.articlesList, data];
+      // state.articlesList = [...state.articlesList, data];
+      // state.total = 2;
+      // state.params.pageNum++;
     };
 
     const routeChange = (val: any, oldVal: any): void => {

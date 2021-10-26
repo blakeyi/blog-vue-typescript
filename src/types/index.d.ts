@@ -23,7 +23,7 @@ export interface LoginParams {
   password: string;
 }
 export interface UserInfo {
-  _id: string;
+  id: string;
   name: string;
   avatar: string | any;
 }
@@ -59,7 +59,7 @@ export interface ParamsArchive {
 export interface ArchiveListItem {
   create_time: string;
   title: string;
-  _id: string;
+  id: string;
 }
 export interface ArchiveList {
   year: string;
@@ -79,13 +79,12 @@ export interface OtherComments {
   state: number;
   to_user: ToUser;
   user: ToUser;
-  _id: string;
+  id: string;
 }
 export interface Comments {
   article_id: string;
   content: string;
   create_time: string;
-  id: number;
   is_handle: number;
   is_top: boolean;
   likes: number;
@@ -95,19 +94,18 @@ export interface Comments {
   user: ToUser;
   user_id: string;
   __v: number;
-  _id: string;
+  id: string;
 }
 
 export interface ArticleDetailIF {
   toc: string;
-  _id: string;
   author: string;
   category: Array<any>;
   comments: Array<Comments>;
   create_time: string;
   desc: string;
   content: string;
-  id: number;
+  id: string;
   img_url: string;
   numbers: number;
   keyword: Array<string>;
@@ -147,7 +145,7 @@ export interface List {
   meta: Meta;
   tags: string[];
   title: string;
-  _id: string;
+  id: string;
 }
 export interface ArticlesData {
   count: number;
@@ -182,7 +180,7 @@ export interface ProjectList {
   start_time: string;
   title: string;
   url: string;
-  _id: string;
+  id: string;
 }
 export interface ProjectsData {
   count: number;
@@ -197,7 +195,7 @@ export interface TimelineList {
   start_time: string;
   title: string;
   state: number;
-  _id: string;
+  id: string;
 }
 export interface TimelinesData {
   count: number;
@@ -208,7 +206,7 @@ export interface TimelinesData {
 // 标签
 export interface TagList {
   name: string;
-  _id: string;
+  id: string;
 }
 export interface TagsData {
   count: number;

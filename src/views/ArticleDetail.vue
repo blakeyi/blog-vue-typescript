@@ -31,29 +31,29 @@
                 字数 {{ state.articleDetail.numbers }}
               </span>
               <span class="views-count">
-                阅读 {{ state.articleDetail.meta.views }}
+                阅读 {{ state.articleDetail.meta?.views }}
               </span>
               <span class="comments-count">
-                评论 {{ state.articleDetail.meta.comments }}
+                评论 {{ state.articleDetail.meta?.comments }}
               </span>
               <span class="likes-count">
-                喜欢 {{ state.articleDetail.meta.likes }}
+                喜欢 {{ state.articleDetail.meta?.likes }}
               </span>
               <el-button
                 type="small"
                 :loading="state.btnLoading"
-                @click="changeMyCount()"
+                @click="changeModel()"
                 >编辑</el-button
               >
             </div>
           </div>
         </div>
       </div>
-      <div>
-        <div v-if="mycount == 2">
+      <div class="content">
+        <div v-if="Model == 2">
           <v-md-editor v-model="state.markContent" height="600px"></v-md-editor>
         </div>
-        <div v-if="mycount == 1">
+        <div v-if="Model == 1">
           <v-md-editor
             v-model="state.markContent"
             height="600px"
@@ -62,7 +62,45 @@
           ></v-md-editor>
         </div>
       </div>
+      <div class="heart">
+        <el-button
+          type="danger"
+          size="large"
+          icon="heart"
+          :loading="state.isLoading"
+          @click="likeArticle"
+        >
+          点赞
+        </el-button>
+      </div>
+      <div class="comment">
+        <el-input
+          placeholder="文明社会，理性评论"
+          type="textarea"
+          v-model="state.content"
+        ></el-input>
+        <el-button
+          style="margin-top: 15px"
+          type="primary"
+          :loading="state.btnLoading"
+          @click="handleAddComment"
+          >发 送</el-button
+        >
+      </div>
+      <CommentList
+        v-if="!state.isLoading"
+        :numbers="state.articleDetail.meta.comments"
+        :list="state.articleDetail.comments"
+        :article_id="state.articleDetail.id"
+        @refreshArticle="refreshArticle"
+      />
     </div>
+    <div
+      v-if="!state.isMobileOrPc"
+      style="width: 23%"
+      class="article-right fr anchor"
+    ></div>
+    <LoadingCustom v-if="state.isLoading"></LoadingCustom>
   </div>
 </template>
 
@@ -87,7 +125,7 @@ import VMdEditor from "@kangc/v-md-editor/lib/codemirror-editor";
 import "@kangc/v-md-editor/lib/style/codemirror-editor.css";
 import githubTheme from "@kangc/v-md-editor/lib/theme/github.js";
 import "@kangc/v-md-editor/lib/theme/style/github.css";
-
+import axios from "axios";
 // highlightjs
 import hljs from "highlight.js";
 
@@ -157,26 +195,18 @@ export default defineComponent({
       } as ArticleDetailParams,
       content: "",
       articleDetail: {
-        toc: "",
-        _id: "",
-        author: "blakeyi",
-        category: [],
-        comments: [],
-        create_time: "",
-        desc: "",
-        content: "",
-        id: 16,
-        img_url: "",
-        numbers: 0,
-        keyword: [],
-        like_users: [],
-        meta: { views: 1, likes: 0, comments: 0 },
-        origin: 0,
-        state: 1,
-        tags: [],
+        id: "",
         title: "",
-        update_time: "",
-      } as ArticleDetailIF,
+        author: "blakeyi",
+        desc: "",
+        meta: { views: 1, likes: 1, comments: 1 },
+        tags: [],
+        comments: {},
+        likeusers: [],
+        createtime: "",
+        updatetime: "",
+        content: "",
+      },
       cacheTime: 0, // 缓存时间
       times: 0, // 评论次数
       likeTimes: 0, // 点赞次数
@@ -187,35 +217,58 @@ export default defineComponent({
     };
 
     const handleSearch = async (): Promise<void> => {
-      console.log(urls.getArticleDetail);
-      console.log(state.params);
-      state.isLoading = true;
+      axios
+        .get("http://blakeyi.cn/getArticleDetail", {
+          params: state.params,
+        })
+        .then(function (response) {
+          console.log(response);
+          var data = response.data;
+          state.articleDetail = data;
+        })
+        .catch(function (error) {
+          alert(error);
+        });
       //const data: any = await service.post(urls.getArticleDetail, state.params);
-      state.isLoading = false;
-      var data = {
-        content: "# hello `java` ",
-        keyword: ["test"],
-        desc: "hell0",
-        title: "blakeyi",
-      };
-      state.articleDetail = data;
+      // state.isLoading = false;
+      // var comment = {
+      //   user:{
+      //     avatar:"123",
+      //     name:"test1",
+      //     type:0,
+      //     create_time:Date.now(),
+      //   },
+      //   content:"1234",
+      // }
+      // var data = {
+      //   content: "# hello `java` ",
+      //   keyword: ["test"],
+      //   desc: "hell0",
+      //   title: "第一篇文章",
+      //   meta: { views: 2, likes: 2, comments: 2 },
+      //   author: "blakeyi",
+      //   numbers: 123,
+      //   comments:[comment],
+      // };
 
-      const article = markdown.marked(data.content);
-      article.then((res: any) => {
-        //state.articleDetail.content = res.content;
-        state.articleDetail.content = "<h1>这是一个h1元素内容</h1>";
-        state.articleDetail.toc = res.toc;
-      });
-      state.articleDetail.content = "<h1>这是一个h1元素内容</h1>";
-      console.log(state.articleDetail.content);
-      let keyword = data.keyword.join(",");
-      let description = data.desc;
-      let title = data.title;
-      document.title = title;
-      document.querySelector("#keywords").setAttribute("content", keyword);
-      document
-        .querySelector("#description")
-        .setAttribute("content", description);
+      // state.articleDetail = data;
+
+      // const article = markdown.marked(data.content);
+      // article.then((res: any) => {
+      //   //state.articleDetail.content = res.content;
+      //   state.articleDetail.content = "<h1>这是一个h1元素内容</h1>";
+      //   state.articleDetail.toc = res.toc;
+      // });
+      // state.articleDetail.content = "<h1>这是一个h1元素内容</h1>";
+      // console.log(state.articleDetail.content);
+      // let keyword = data.keyword.join(",");
+      // let description = data.desc;
+      // let title = data.title;
+      // document.title = title;
+      // document.querySelector("#keywords").setAttribute("content", keyword);
+      // document
+      //   .querySelector("#description")
+      //   .setAttribute("content", description);
     };
 
     const refreshArticle = (): void => {
@@ -223,7 +276,7 @@ export default defineComponent({
     };
 
     const likeArticle = async (): Promise<void> => {
-      if (!state.articleDetail._id) {
+      if (!state.articleDetail.id) {
         ElMessage({
           message: "该文章不存在！",
           type: "warning",
@@ -242,7 +295,7 @@ export default defineComponent({
       let user_id: string = "";
       if (window.sessionStorage.userInfo) {
         let userInfo = JSON.parse(window.sessionStorage.userInfo);
-        user_id = userInfo._id;
+        user_id = userInfo.id;
       } else {
         ElMessage({
           message: "登录才能点赞，请先登录！",
@@ -251,7 +304,7 @@ export default defineComponent({
         return;
       }
       let params: LikeParams = {
-        id: state.articleDetail._id,
+        id: state.articleDetail.id,
         user_id,
       };
       await service.post(urls.likeArticle, params);
@@ -266,7 +319,7 @@ export default defineComponent({
     };
 
     const handleAddComment = async (): Promise<void> => {
-      if (!state.articleDetail._id) {
+      if (!state.articleDetail.id) {
         ElMessage({
           message: "该文章不存在！",
           type: "error",
@@ -302,7 +355,7 @@ export default defineComponent({
       let user_id = "";
       if (window.sessionStorage.userInfo) {
         let userInfo = JSON.parse(window.sessionStorage.userInfo);
-        user_id = userInfo._id;
+        user_id = userInfo.id;
       } else {
         ElMessage({
           message: "登录才能评论，请先登录！",
@@ -313,7 +366,7 @@ export default defineComponent({
 
       state.btnLoading = true;
       await service.post(urls.addComment, {
-        article_id: state.articleDetail._id,
+        article_id: state.articleDetail.id,
         user_id,
         content: state.content,
       });
@@ -336,21 +389,13 @@ export default defineComponent({
       }
       handleSearch();
     });
-    function handleEdit() {
-      console.log(text.value);
-      state.markContent = "11";
-      if (text.value == 1) {
-        text.value = 2;
+
+    const Model = ref(1);
+    const changeModel = () => {
+      if (Model.value == 1) {
+        Model.value = 2;
       } else {
-        text.value = 1;
-      }
-    }
-    const mycount = ref(2);
-    const changeMyCount = () => {
-      if (mycount.value == 1) {
-        mycount.value = 2;
-      } else {
-        mycount.value = 1;
+        Model.value = 1;
       }
     };
 
@@ -361,10 +406,9 @@ export default defineComponent({
       handleAddComment,
       likeArticle,
       refreshArticle,
-      handleEdit,
       text,
-      mycount,
-      changeMyCount,
+      Model,
+      changeModel,
     };
   },
   beforeUnmount(): void {
@@ -381,7 +425,7 @@ export default defineComponent({
   },
 });
 </script>
-<style lang="less" scoped>
+<style lang="less" scope>
 .anchor {
   display: block;
   position: sticky;
@@ -468,6 +512,7 @@ export default defineComponent({
   }
   .content {
     min-height: 300px;
+    border: #333;
   }
 }
 .heart {
@@ -481,8 +526,8 @@ export default defineComponent({
   padding: 50px;
   font-size: 16px;
 }
-.clearfix {
-  clear: both;
+.el-textarea__inner {
+  border-radius: 20px;
 }
 </style>
 

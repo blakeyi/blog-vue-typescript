@@ -1,14 +1,14 @@
 <template>
   <div class="left">
     <el-input
-      v-model="state.searchInput"
+      v-model="state.title"
       placeholder="请输入文章标题"
       prefix-icon="el-icon-search"
       style="width:35%"
     />
-    <el-button type="primary" icon="el-icon-plus">保存草稿</el-button>
-    <el-button type="primary" icon="el-icon-plus">发布文章</el-button>
-    <v-md-editor v-model="state.markContent" height="600px" v-if="state.editting" style="margin-top: 300px"></v-md-editor>
+    <el-button type="primary" icon="el-icon-plus" @click="handleSave">保存草稿</el-button>
+    <el-button type="primary" icon="el-icon-plus" @click="handleAdd">发布文章</el-button>
+    <v-md-editor v-model="state.markContent" height="800px"  style="margin-top: 300px"></v-md-editor>
     
   </div>
 </template>
@@ -81,219 +81,25 @@ export default defineComponent({
   },
   setup() {
     const state = reactive({
-      btnLoading: false,
-      isLoadEnd: false,
-      isLoading: false,
-      editting: true, // 正在编辑
-      markContent: "## 2 test",
-      isMobileOrPc: isMobileOrPc(),
-      params: {
-        id: "",
-        type: 1, //文章类型 => 1: 普通文章，2: 简历，3: 管理员介绍
-      } as ArticleDetailParams,
-      content: "",
-      title: "",
-      articleDetail: {
-        toc: "",
-        _id: "",
-        author: "blakeyi",
-        category: [],
-        comments: [],
-        create_time: "",
-        desc: "",
-        content: "",
-        id: 16,
-        img_url: "",
-        numbers: 0,
-        keyword: [],
-        like_users: [],
-        meta: { views: 1, likes: 0, comments: 0 },
-        origin: 0,
-        state: 1,
-        tags: [],
-        title: "",
-        update_time: "",
-      } as ArticleDetailIF,
-      cacheTime: 0, // 缓存时间
-      times: 0, // 评论次数
-      likeTimes: 0, // 点赞次数
-    });
-
-    const formatTime = (value: string | Date): string => {
-      return timestampToTime(value, true);
+      title:"",
+      markContent:""
+    })
+    function handleSave() {
+      console.log("handleSave")
     };
 
-    const handleSearch = async (): Promise<void> => {
-      console.log(urls.getArticleDetail);
-      console.log(state.params);
-      state.isLoading = true;
-      //const data: any = await service.post(urls.getArticleDetail, state.params);
-      state.isLoading = false;
-      var data = {
-        content: "# hello `java` ",
-        keyword: ["test"],
-        desc: "hell0",
-        title: "blakeyi",
-      };
-      state.articleDetail = data;
-
-      const article = markdown.marked(data.content);
-      article.then((res: any) => {
-        //state.articleDetail.content = res.content;
-        state.articleDetail.content = "<h1>这是一个h1元素内容</h1>";
-        state.articleDetail.toc = res.toc;
-      });
-      state.articleDetail.content = "<h1>这是一个h1元素内容</h1>";
-      console.log(state.articleDetail.content);
-      let keyword = data.keyword.join(",");
-      let description = data.desc;
-      let title = data.title;
-      document.title = title;
-      document.querySelector("#keywords").setAttribute("content", keyword);
-      document
-        .querySelector("#description")
-        .setAttribute("content", description);
+    const handleAdd = async (): Promise<void> => {
+      console.log("handleAdd")
+      console.log(state.title)
+      console.log(state.markContent)
     };
-
-    const refreshArticle = (): void => {
-      handleSearch();
-    };
-
-    const likeArticle = async (): Promise<void> => {
-      if (!state.articleDetail._id) {
-        ElMessage({
-          message: "该文章不存在！",
-          type: "warning",
-        });
-        return;
-      }
-
-      if (state.likeTimes > 0) {
-        ElMessage({
-          message: "您已经点过赞了！悠着点吧！",
-          type: "warning",
-        });
-        return;
-      }
-
-      let user_id: string = "";
-      if (window.sessionStorage.userInfo) {
-        let userInfo = JSON.parse(window.sessionStorage.userInfo);
-        user_id = userInfo._id;
-      } else {
-        ElMessage({
-          message: "登录才能点赞，请先登录！",
-          type: "warning",
-        });
-        return;
-      }
-      let params: LikeParams = {
-        id: state.articleDetail._id,
-        user_id,
-      };
-      await service.post(urls.likeArticle, params);
-      state.isLoading = false;
-
-      state.likeTimes++;
-      ++state.articleDetail.meta.likes;
-      ElMessage({
-        message: "操作成功",
-        type: "success",
-      });
-    };
-
-    const handleAddComment = async (): Promise<void> => {
-      if (!state.articleDetail._id) {
-        ElMessage({
-          message: "该文章不存在！",
-          type: "error",
-        });
-        return;
-      }
-
-      if (state.times > 2) {
-        ElMessage({
-          message: "您今天评论的次数已经用完，明天再来评论吧！",
-          type: "warning",
-        });
-        return;
-      }
-
-      let now = new Date();
-      let nowTime = now.getTime();
-      if (nowTime - state.cacheTime < 4000) {
-        ElMessage({
-          message: "您评论太过频繁，1 分钟后再来留言吧！",
-          type: "warning",
-        });
-        return;
-      }
-
-      if (!state.content) {
-        ElMessage({
-          message: "请输入内容!",
-          type: "warning",
-        });
-        return;
-      }
-      let user_id = "";
-      if (window.sessionStorage.userInfo) {
-        let userInfo = JSON.parse(window.sessionStorage.userInfo);
-        user_id = userInfo._id;
-      } else {
-        ElMessage({
-          message: "登录才能评论，请先登录！",
-          type: "warning",
-        });
-        return;
-      }
-
-      state.btnLoading = true;
-      await service.post(urls.addComment, {
-        article_id: state.articleDetail._id,
-        user_id,
-        content: state.content,
-      });
-      state.btnLoading = false;
-      state.times++;
-      state.cacheTime = nowTime;
-      state.content = "";
-      ElMessage({
-        message: "操作成功",
-        type: "success",
-      });
-      handleSearch();
-    };
-
-    const route = useRoute();
-    onMounted(() => {
-      state.params.id = route.query.article_id as string;
-      if (route.path === "/about") {
-        state.params.type = 3;
-      }
-      handleSearch();
-    });
 
     return {
       state,
-      formatTime,
-      handleSearch,
-      handleAddComment,
-      likeArticle,
-      refreshArticle,
-    };
-  },
-  beforeUnmount(): void {
-    document.title = "夜尽天明的博客网站";
-    document
-      .getElementById("keywords")
-      .setAttribute("content", "夜尽天明 的博客网站");
-    document
-      .getElementById("description")
-      .setAttribute(
-        "content",
-        "分享大前端开发等相关的技术文章，热点资源，全栈程序员的成长之路。"
-      );
+      handleSave,
+      handleAdd,
+    }
+  
   },
 });
 </script>
