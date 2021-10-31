@@ -12,24 +12,26 @@
           prefix-icon="el-icon-search"
           style="width: 100%"
       /></el-col>
-      <el-col :span="6"   
+      <el-col :span="6"
         ><el-button type="primary" icon="el-icon-search"
           >搜索文章</el-button
         ></el-col
       >
-      <el-col :span="6"><a :href="state.href1" target="_blank">
+      <el-col :span="6"
+        ><a :href="state.href1" target="_blank">
           <el-button type="primary" icon="el-icon-plus">新增文章</el-button>
-        </a></el-col>
+        </a></el-col
+      >
     </el-row>
-    
+
     <ul class="articles-list" id="list">
       <transition-group name="el-fade-in">
         <li
           v-for="article in state.articlesList"
-          :key="article.id"
+          :key="article._id"
           class="item"
         >
-          <a :href="state.href + article.id" target="_blank">
+          <a :href="state.href + article._id" target="_blank">
             <img
               class="wrap-img img-blur-done"
               data-src="../assets/bg.jpg"
@@ -44,8 +46,8 @@
                 <span>阅读 {{ article.meta.views }}</span>
                 <span>评论 {{ article.meta.comments }}</span>
                 <span>赞 {{ article.meta.likes }}</span>
-                <span v-if="article.create_time" class="time">
-                  {{ formatTime(article.create_time) }}
+                <span v-if="article.createtime" class="time">
+                  {{ formatTime(article.createtime) }}
                 </span>
               </div>
             </div>
@@ -148,29 +150,21 @@ export default defineComponent({
     };
 
     const handleSearch = async (): Promise<void> => {
+      var data = {
+        page_num: 1,
+        page_size: 10,
+      };
       axios
-        .post("http://blakeyi.cn/getArticleList", {
-          params: state.params,
-        })
+        .post("http://blakeyi.cn/articleList", data)
         .then(function (response) {
           console.log(response);
-          var data = response.data;
           state.isLoading = false;
-          state.articlesList = [...state.articlesList, ...data.list];
-          state.total = data.Count;
+          state.articlesList = response.data.ret_content.list;
+          state.total = response.data.ret_content.count;
           state.params.pageNum++;
           nextTick(() => {
             lazyload();
           });
-          console.log("data:", data);
-          if (
-            data.list.length === 0 ||
-            state.total === state.articlesList.length
-          ) {
-            state.isLoadEnd = true;
-            document.removeEventListener("scroll", () => {});
-            window.onscroll = null;
-          }
         })
         .catch(function (error) {
           alert(error);
@@ -203,7 +197,7 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      //handleSearch();
+      handleSearch();
       window.onscroll = () => {
         if (getScrollTop() + getWindowHeight() > getDocumentHeight() - 100) {
           // 如果不是已经没有数据了，都可以继续滚动加载

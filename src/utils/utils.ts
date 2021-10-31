@@ -125,7 +125,8 @@ export function getWindowHeight() {
 }
 //// 时间 格式化成 2018-12-12 12:12:00
 export function timestampToTime(timestamp: Date | any, dayMinSecFlag: boolean) {
-  const date = new Date(timestamp);
+  var time = Number(timestamp)
+  const date = new Date(time);
   const Y = date.getFullYear() + "-";
   const M =
     (date.getMonth() + 1 < 10

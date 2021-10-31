@@ -39,19 +39,32 @@
               <span class="likes-count">
                 喜欢 {{ state.articleDetail.meta?.likes }}
               </span>
-              <el-button
-                type="small"
-                :loading="state.btnLoading"
-                @click="changeModel()"
-                >编辑</el-button
-              >
+              <span>
+                <el-button
+                  type="small"
+                  :loading="state.btnLoading"
+                  @click="changeModel()"
+                  >编辑</el-button
+                >
+              </span>
+              <span>
+                <el-button
+                  type="small"
+                  :loading="state.btnLoading"
+                  @click="republish()"
+                  >重新发布</el-button
+                >
+              </span>
             </div>
           </div>
         </div>
       </div>
       <div class="content">
         <div v-if="Model == 2">
-          <v-md-editor v-model="state.markContent" height="600px"></v-md-editor>
+          <v-md-editor
+            v-model="state.markContentEdit"
+            height="600px"
+          ></v-md-editor>
         </div>
         <div v-if="Model == 1">
           <v-md-editor
@@ -126,6 +139,7 @@ import "@kangc/v-md-editor/lib/style/codemirror-editor.css";
 import githubTheme from "@kangc/v-md-editor/lib/theme/github.js";
 import "@kangc/v-md-editor/lib/theme/style/github.css";
 import axios from "axios";
+import { Base64 } from "js-base64";
 // highlightjs
 import hljs from "highlight.js";
 
@@ -187,7 +201,8 @@ export default defineComponent({
       btnLoading: false,
       isLoadEnd: false,
       isLoading: false,
-      markContent: "## 2 test",
+      markContent: "",
+      markContentEdit: "", // 编辑框内容
       isMobileOrPc: isMobileOrPc(),
       params: {
         id: "",
@@ -196,12 +211,12 @@ export default defineComponent({
       content: "",
       articleDetail: {
         id: "",
-        title: "",
+        title: "第一篇文章",
         author: "blakeyi",
         desc: "",
         meta: { views: 1, likes: 1, comments: 1 },
         tags: [],
-        comments: {},
+        comments: [],
         likeusers: [],
         createtime: "",
         updatetime: "",
@@ -217,58 +232,19 @@ export default defineComponent({
     };
 
     const handleSearch = async (): Promise<void> => {
+      var queryData = {
+        _id: state.params.id,
+      };
       axios
-        .get("http://blakeyi.cn/getArticleDetail", {
-          params: state.params,
-        })
+        .post("http://blakeyi.cn/articleQuery", queryData)
         .then(function (response) {
           console.log(response);
-          var data = response.data;
-          state.articleDetail = data;
+          state.articleDetail = response.data.ret_content;
+          state.markContent = Base64.decode(response.data.ret_content.content);
         })
         .catch(function (error) {
           alert(error);
         });
-      //const data: any = await service.post(urls.getArticleDetail, state.params);
-      // state.isLoading = false;
-      // var comment = {
-      //   user:{
-      //     avatar:"123",
-      //     name:"test1",
-      //     type:0,
-      //     create_time:Date.now(),
-      //   },
-      //   content:"1234",
-      // }
-      // var data = {
-      //   content: "# hello `java` ",
-      //   keyword: ["test"],
-      //   desc: "hell0",
-      //   title: "第一篇文章",
-      //   meta: { views: 2, likes: 2, comments: 2 },
-      //   author: "blakeyi",
-      //   numbers: 123,
-      //   comments:[comment],
-      // };
-
-      // state.articleDetail = data;
-
-      // const article = markdown.marked(data.content);
-      // article.then((res: any) => {
-      //   //state.articleDetail.content = res.content;
-      //   state.articleDetail.content = "<h1>这是一个h1元素内容</h1>";
-      //   state.articleDetail.toc = res.toc;
-      // });
-      // state.articleDetail.content = "<h1>这是一个h1元素内容</h1>";
-      // console.log(state.articleDetail.content);
-      // let keyword = data.keyword.join(",");
-      // let description = data.desc;
-      // let title = data.title;
-      // document.title = title;
-      // document.querySelector("#keywords").setAttribute("content", keyword);
-      // document
-      //   .querySelector("#description")
-      //   .setAttribute("content", description);
     };
 
     const refreshArticle = (): void => {
@@ -393,12 +369,29 @@ export default defineComponent({
     const Model = ref(1);
     const changeModel = () => {
       if (Model.value == 1) {
+        state.markContentEdit = state.markContent;
         Model.value = 2;
       } else {
         Model.value = 1;
       }
     };
-
+    const republish = () => {
+      console.log(state.markContentEdit);
+      state.markContent = state.markContentEdit;
+      Model.value = 1;
+      var updateData = {
+        _id: state.params.id,
+        content: Base64.encode(state.markContentEdit),
+      };
+      axios
+        .post("http://blakeyi.cn/articleUpdate", updateData)
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          alert(error);
+        });
+    };
     return {
       state,
       formatTime,
@@ -409,6 +402,7 @@ export default defineComponent({
       text,
       Model,
       changeModel,
+      republish,
     };
   },
   beforeUnmount(): void {

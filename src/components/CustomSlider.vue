@@ -76,18 +76,18 @@ export default defineComponent({
     });
 
     const handleSearch = async (): Promise<void> => {
-      state.isLoading = true;
-      const data: TagsData = await service.get(urls.getTagList, {
-        params: state.params,
-      });
-      state.isLoading = false;
+      // state.isLoading = true;
+      // const data: TagsData = await service.get(urls.getTagList, {
+      //   params: state.params,
+      // });
+      // state.isLoading = false;
 
-      state.list = [...state.list, ...data.list];
-      state.total = data.count;
-      state.params.pageNum++;
-      if (state.total === state.list.length) {
-        state.isLoadEnd = true;
-      }
+      // state.list = [...state.list, ...data.list];
+      // state.total = data.count;
+      // state.params.pageNum++;
+      // if (state.total === state.list.length) {
+      //   state.isLoadEnd = true;
+      // }
     };
 
     onMounted(() => {

@@ -4,12 +4,19 @@
       v-model="state.title"
       placeholder="请输入文章标题"
       prefix-icon="el-icon-search"
-      style="width:35%"
+      style="width: 35%"
     />
-    <el-button type="primary" icon="el-icon-plus" @click="handleSave">保存草稿</el-button>
-    <el-button type="primary" icon="el-icon-plus" @click="handleAdd">发布文章</el-button>
-    <v-md-editor v-model="state.markContent" height="800px"  style="margin-top: 300px"></v-md-editor>
-    
+    <el-button type="primary" icon="el-icon-plus" @click="handleSave"
+      >保存草稿</el-button
+    >
+    <el-button type="primary" icon="el-icon-plus" @click="handleAdd"
+      >发布文章</el-button
+    >
+    <v-md-editor
+      v-model="state.markContent"
+      height="800px"
+      style="margin-top: 300px"
+    ></v-md-editor>
   </div>
 </template>
 
@@ -37,7 +44,8 @@ import "@kangc/v-md-editor/lib/theme/style/github.css";
 
 // highlightjs
 import hljs from "highlight.js";
-
+import axios from "axios";
+import { Base64 } from "js-base64";
 // codemirror 编辑器的相关资源
 import Codemirror from "codemirror";
 // mode
@@ -81,25 +89,51 @@ export default defineComponent({
   },
   setup() {
     const state = reactive({
-      title:"",
-      markContent:""
-    })
+      title: "",
+      markContent: "",
+    });
     function handleSave() {
-      console.log("handleSave")
-    };
+      console.log("handleSave");
+    }
 
     const handleAdd = async (): Promise<void> => {
-      console.log("handleAdd")
-      console.log(state.title)
-      console.log(state.markContent)
+      console.log("handleAdd");
+      console.log(state.title);
+      console.log(state.markContent);
+      var date = new Date();
+      var newData = {
+        title: state.title,
+        author: "blakeyi",
+        desc: "MongoDB 是一个 Nosql 数据库",
+        meta: {
+          views: 0,
+          comments: 0,
+          likes: 0,
+        },
+        tags: ["mongodb", "database", "NoSQL"],
+        comments: [],
+        likeusers: [],
+        createtime: date.getTime(),
+        updatetime: date.getTime(),
+        content: Base64.encode(state.markContent),
+      };
+      console.log(newData);
+
+      axios
+        .post("http://blakeyi.cn/articleCreate", newData)
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          alert(error);
+        });
     };
 
     return {
       state,
       handleSave,
       handleAdd,
-    }
-  
+    };
   },
 });
 </script>
