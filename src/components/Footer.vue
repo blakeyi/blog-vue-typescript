@@ -21,9 +21,9 @@ export default defineComponent({
   text-align: center;
   padding: 20px;
   font-weight: bold;
-  position:float; 
-  bottom:2%;
-  left:40%
+  position: fixed;
+  bottom: 0;
+  left: 30%;
 }
 </style>
 

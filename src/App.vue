@@ -109,4 +109,11 @@ export default defineComponent({
 img {
   vertical-align: bottom;
 }
+.container {
+  display: flex;
+  flex-direction: column;
+}
+.layout {
+  height: 800px;
+}
 </style>

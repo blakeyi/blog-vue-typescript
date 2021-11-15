@@ -18,9 +18,9 @@
         ></el-col
       >
       <el-col :span="6"
-        ><a :href="state.href1" target="_blank">
+        ><router-link to="/articleCreate">
           <el-button type="primary" icon="el-icon-plus">新增文章</el-button>
-        </a></el-col
+        </router-link></el-col
       >
     </el-row>
 
@@ -35,7 +35,6 @@
             <img
               class="wrap-img img-blur-done"
               data-src="../assets/bg.jpg"
-              data-has-lazy-src="false"
               src="../assets/bg.jpg"
               alt="文章封面"
             />
@@ -169,22 +168,6 @@ export default defineComponent({
         .catch(function (error) {
           alert(error);
         });
-      // state.isLoading = false;
-      // var data = {
-      //   title: "article1",
-      //   id: 123,
-      //   desc: "123",
-      //   meta: {
-      //     views: 123,
-      //     comments: 123,
-      //     likes: 123,
-      //   },
-      //   create_time:Date.now(),
-      // };
-      // state.articlesList = [...state.articlesList, data];
-      // state.articlesList = [...state.articlesList, data];
-      // state.total = 2;
-      // state.params.pageNum++;
     };
 
     const routeChange = (val: any, oldVal: any): void => {

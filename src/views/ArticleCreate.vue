@@ -1,22 +1,30 @@
 <template>
-  <div class="left">
-    <el-input
-      v-model="state.title"
-      placeholder="请输入文章标题"
-      prefix-icon="el-icon-search"
-      style="width: 35%"
-    />
-    <el-button type="primary" icon="el-icon-plus" @click="handleSave"
-      >保存草稿</el-button
-    >
-    <el-button type="primary" icon="el-icon-plus" @click="handleAdd"
-      >发布文章</el-button
-    >
+  <div class="main">
+  <div class="top">
+    <div class="left">
+      <el-input
+        v-model="state.title"
+        placeholder="请输入文章标题"
+        prefix-icon="el-icon-search"
+        style="width: 35%"
+      />
+    </div>
+    <div class="right">
+      <el-button type="primary" icon="el-icon-plus" @click="handleSave"
+        >保存草稿</el-button
+      >
+      <el-button type="primary" icon="el-icon-plus" @click="handleAdd"
+        >发布文章</el-button
+      >
+    </div>
+  </div>
+  <div class="body">
     <v-md-editor
       v-model="state.markContent"
-      height="800px"
-      style="margin-top: 300px"
+      height="780px"
+      style="margin-top:40px"
     ></v-md-editor>
+  </div>
   </div>
 </template>
 
@@ -113,8 +121,8 @@ export default defineComponent({
         tags: ["mongodb", "database", "NoSQL"],
         comments: [],
         likeusers: [],
-        createtime: date.getTime(),
-        updatetime: date.getTime(),
+        createtime: date.getTime().toString(),
+        updatetime: date.getTime().toString(),
         content: Base64.encode(state.markContent),
       };
       console.log(newData);
@@ -138,114 +146,22 @@ export default defineComponent({
 });
 </script>
 <style lang="less" scoped>
-.demo-input-suffix {
-  position: fixed;
-}
-.anchor {
-  display: block;
-  position: sticky;
-  top: 213px;
-  margin-top: 213px;
-  border-left: 1px solid #eee;
-  .anchor-ul {
-    position: relative;
-    top: 0;
-    max-width: 250px;
-    border: none;
-    -moz-box-shadow: 0 0px 0px #fff;
-    -webkit-box-shadow: 0 0px 0px #fff;
-    box-shadow: 0 0px 0px #fff;
-
-    li.active {
-      color: #009a61;
-    }
-  }
-  a {
-    color: #333;
-  }
-}
-.article {
-  width: 100%;
-  .header {
-    .title {
-      margin: 20px 0 0;
-      text-align: center;
-      font-size: 34px;
-      font-weight: bold;
-    }
-    .author {
-      position: relative;
-      margin: 30px 0 40px;
-      padding-left: 50px;
-      .avatar {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 48px;
-        height: 48px;
-        vertical-align: middle;
-        display: inline-block;
-        img {
-          width: 100%;
-          height: 100%;
-          border-radius: 50%;
-        }
-      }
-      .info {
-        float: left;
-        vertical-align: middle;
-        // display: inline-block;
-        margin-left: 8px;
-        a {
-          color: #333;
-        }
-      }
-      .name {
-        margin-right: 3px;
-        font-size: 16px;
-        vertical-align: middle;
-      }
-      .meta {
-        margin-top: 5px;
-        font-size: 12px;
-        color: #969696;
-        span {
-          padding-right: 5px;
-        }
-      }
-      .tags {
-        float: right;
-        padding-top: 15px;
-        // padding-right: 20px;
-        .tag {
-          // padding: 0 10px;
-          margin-left: 5px;
-          border-right: 2px solid #eee;
-        }
-      }
-    }
-  }
-  .content {
-    min-height: 300px;
-  }
-}
-.heart {
+.main {
   height: 60px;
-  text-align: center;
-  margin: 50px;
+  width: 120%;
+  display: flex;
+  flex-direction: column;
 }
-.loader {
-  color: rgb(226, 44, 44);
-  text-align: center;
-  padding: 50px;
-  font-size: 16px;
+.top {
+  height: 60px;
+  width: 120%;
+  display: flex;
 }
-.clearfix {
-  clear: both;
+.body {
+  height: 600px;
+  width: 120%;
+  display: flex;
 }
 
-.el-input__inner {
-  width: 50%;
-}
 </style>
 
