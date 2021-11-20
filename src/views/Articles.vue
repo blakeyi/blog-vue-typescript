@@ -5,7 +5,7 @@
     </h3>
 
     <el-row :gutter="20">
-      <el-col :span="10"
+      <el-col :span="6"
         ><el-input
           v-model="state.searchInput"
           placeholder="关键字"
@@ -32,12 +32,12 @@
           class="item"
         >
           <a :href="state.href + article._id" target="_blank">
-            <img
+            <!-- <img
               class="wrap-img img-blur-done"
               data-src="../assets/bg.jpg"
               src="../assets/bg.jpg"
               alt="文章封面"
-            />
+            /> -->
             <div class="content">
               <h4 class="title">{{ article.title }}</h4>
               <p class="abstract">{{ article.desc }}</p>
@@ -156,7 +156,6 @@ export default defineComponent({
       axios
         .post("http://blakeyi.cn/articleList", data)
         .then(function (response) {
-          console.log(response);
           state.isLoading = false;
           state.articlesList = response.data.ret_content.list;
           state.total = response.data.ret_content.count;

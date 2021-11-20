@@ -5,7 +5,7 @@
       <router-view />
       <CustomSlider v-if="state.isShowSlider"></CustomSlider>
     </div>
-    <ArrowUp></ArrowUp>
+    <ArrowUp v-if="state.isShowNav"></ArrowUp>
     <!-- <Footer v-if="isShowNav"></Footer> -->
   </div>
 </template>
@@ -114,6 +114,7 @@ img {
   flex-direction: column;
 }
 .layout {
-  height: 800px;
+  // height: 800px;
+  width: 100%;
 }
 </style>

@@ -1,31 +1,49 @@
 <template>
   <div class="main">
-  <div class="top">
-    <div class="left">
-      <el-input
-        v-model="state.title"
-        placeholder="请输入文章标题"
-        prefix-icon="el-icon-search"
-        style="width: 35%"
-      />
+    <div class="top">
+      <div class="left">
+        <router-link to="/articles">
+          <i class="el-icon-arrow-left"></i>
+          <el-button style="padding: 3px 0"> 文章管理</el-button>
+        </router-link>
+        <el-input
+          v-model="state.title"
+          placeholder="请输入文章标题"
+          style="width: 35%"
+        />
+      </div>
+      <div class="right">
+        <el-button type="info" icon="el-icon-plus" @click="handleSave" round
+          >保存草稿</el-button
+        >
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          @click="dialogFormVisible = true"
+          round
+          >发布文章</el-button
+        >
+      </div>
     </div>
-    <div class="right">
-      <el-button type="primary" icon="el-icon-plus" @click="handleSave"
-        >保存草稿</el-button
-      >
-      <el-button type="primary" icon="el-icon-plus" @click="handleAdd"
-        >发布文章</el-button
-      >
+    <div class="body">
+      <v-md-editor
+        v-model="state.markContent"
+        height="700px"
+        style="margin-top: 40px"
+      ></v-md-editor>
     </div>
   </div>
-  <div class="body">
-    <v-md-editor
-      v-model="state.markContent"
-      height="780px"
-      style="margin-top:40px"
-    ></v-md-editor>
-  </div>
-  </div>
+<el-dialog v-model="dialogFormVisible" title="Shipping address" :append-to-body="true">
+    <h1>11111</h1>
+    <!-- <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="dialogFormVisible = false"
+          >Confirm</el-button
+        >
+      </span>
+    </template> -->
+  </el-dialog>
 </template>
 
 
@@ -95,6 +113,45 @@ export default defineComponent({
     CommentList,
     VMdEditor,
   },
+  data() {
+    return {
+      gridData: [
+        {
+          date: "2016-05-02",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1518 弄",
+        },
+        {
+          date: "2016-05-04",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1518 弄",
+        },
+        {
+          date: "2016-05-01",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1518 弄",
+        },
+        {
+          date: "2016-05-03",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1518 弄",
+        },
+      ],
+      dialogTableVisible: false,
+      dialogFormVisible: false,
+      form: {
+        name: "",
+        region: "",
+        date1: "",
+        date2: "",
+        delivery: false,
+        type: [],
+        resource: "",
+        desc: "",
+      },
+      formLabelWidth: "120px",
+    };
+  },
   setup() {
     const state = reactive({
       title: "",
@@ -147,21 +204,28 @@ export default defineComponent({
 </script>
 <style lang="less" scoped>
 .main {
-  height: 60px;
-  width: 120%;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
 .top {
-  height: 60px;
-  width: 120%;
+  height: 40px;
+  width: 100%;
   display: flex;
+  margin-top: 5px;
 }
 .body {
-  height: 600px;
-  width: 120%;
+  width: 100%;
   display: flex;
+  margin-top: 5px;
 }
 
+.right {
+  display: flex;
+  justify-content: flex-end;
+}
+.el-dialog{
+  background-color: white;
+}
 </style>
 
