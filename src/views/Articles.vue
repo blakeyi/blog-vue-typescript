@@ -1,28 +1,19 @@
 <template>
   <div class="left clearfix">
-    <h3 v-if="state.params.tag_id" class="left-title">
-      {{ state.tag_name }} 相关的文章：
+    <h3 v-if="state.params.tag_id">
+      {{ state.tag_name }} 相关的文章
     </h3>
-
-    <el-row :gutter="20">
-      <el-col :span="6"
-        ><el-input
-          v-model="state.searchInput"
-          placeholder="关键字"
-          prefix-icon="el-icon-search"
-          style="width: 100%"
-      /></el-col>
-      <el-col :span="6"
-        ><el-button type="primary" icon="el-icon-search"
-          >搜索文章</el-button
-        ></el-col
-      >
-      <el-col :span="6"
-        ><router-link to="/articleCreate">
-          <el-button type="primary" icon="el-icon-plus">新增文章</el-button>
-        </router-link></el-col
-      >
-    </el-row>
+    <el-input
+      v-model="state.searchInput"
+      placeholder="关键字"
+      prefix-icon="el-icon-search"
+      style="width: 50%; margin-right:10px"
+    >
+    </el-input>
+    <el-button type="primary" icon="el-icon-search" >搜索文章</el-button>
+    <router-link to="/articleCreate">
+      <el-button type="success" icon="el-icon-plus">新增文章</el-button>
+    </router-link>
 
     <ul class="articles-list" id="list">
       <transition-group name="el-fade-in">
@@ -31,13 +22,7 @@
           :key="article._id"
           class="item"
         >
-          <a :href="state.href + article._id" target="_blank">
-            <!-- <img
-              class="wrap-img img-blur-done"
-              data-src="../assets/bg.jpg"
-              src="../assets/bg.jpg"
-              alt="文章封面"
-            /> -->
+          <router-link :to="state.href + article._id">
             <div class="content">
               <h4 class="title">{{ article.title }}</h4>
               <p class="abstract">{{ article.desc }}</p>
@@ -50,7 +35,7 @@
                 </span>
               </div>
             </div>
-          </a>
+          </router-link>
         </li>
       </transition-group>
     </ul>
@@ -117,6 +102,13 @@ export default defineComponent({
       immediate: true,
     },
   },
+  data() {
+    return {
+      searchInput: "11",
+      articlesList: [],
+    };
+  },
+
   setup(props, context) {
     const state = reactive({
       isLoadEnd: false,
@@ -303,5 +295,9 @@ export default defineComponent({
 .row-bg {
   padding: 10px 0;
   background-color: #f9fafc;
+}
+.el-button--primary {
+  color: #fff;
+  margin-right: 10px;
 }
 </style>

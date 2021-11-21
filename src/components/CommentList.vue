@@ -5,7 +5,7 @@
       <span>{{numbers}} 条评论</span>
     </div>
     <div
-      v-for="(item, i) in list"
+      v-for="item in list"
       :key="item._id"
       class="item"
     >
@@ -30,7 +30,7 @@
             {{item.user.type === 0 ? '(作者)' : ''}}
           </div>
           <div class="time">
-            {{formatTime(item.create_time)}}
+            {{formatTime(item.createtime)}}
           </div>
         </div>
       </div>
@@ -44,7 +44,7 @@
         </div>
       </div>
       <div
-        v-for="e in item.other_comments"
+        v-for="e in item.othercomments"
         :key="e._id"
         class="item-other"
       >
@@ -69,13 +69,13 @@
               {{e.user.type === 0 ? '(作者)' : ''}}
             </div>
             <div class="time">
-              {{formatTime(e.create_time)}}
+              {{formatTime(e.createtime)}}
             </div>
           </div>
         </div>
         <div class="comment-detail">
-          {{'@' + e.to_user.name}}
-          {{e.to_user.type === 0 ? '(作者)' : ''}}：{{e.content}}
+          {{'@' + e.touser.name}}
+          {{e.touser.type === 0 ? '(作者)' : ''}}：{{e.content}}
         </div>
         <div class="item-comment">
           <div class="message">

@@ -50,7 +50,7 @@ const routes: Array<RouteRecordRaw> = [
       path: "/about",
       name: "about",
       component: () =>
-        import(/* webpackChunkName: "about" */ "../views/ArticleDetail.vue")
+        import(/* webpackChunkName: "about" */ "../views/About.vue")
     },
     {
       path: "/articleCreate",

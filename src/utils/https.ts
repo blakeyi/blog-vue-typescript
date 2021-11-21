@@ -14,13 +14,13 @@ export interface ResponseData {
 let service: AxiosInstance | any;
 if (import.meta.env.MODE === "development") {
   service = axios.create({
-    baseURL: "/api", // api 的 base_url
+    baseURL: "", // api 的 base_url
     timeout: 50000 // 请求超时时间
   });
 } else {
   // 生产环境下
   service = axios.create({
-    baseURL: "/api",
+    baseURL: "",
     timeout: 50000
   });
 }

@@ -1,9 +1,9 @@
 // url的链接
 export const urls: any = {
-  login: "login",
-  logout: "logout",
-  register: "register",
-  getUser: "getUser",
+  login: "userLogin",
+  logout: "userLogout",
+  register: "userregister",
+  getUser: "userQuery",
 
   addComment: "addComment",
   addThirdComment: "addThirdComment",

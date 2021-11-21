@@ -64,6 +64,7 @@ export default defineComponent({
         "/project",
         "/timeline",
         "/message",
+        "/about",
       ];
       if (navs.includes(val.path)) {
         state.isShowSlider = true;
@@ -117,4 +118,5 @@ img {
   // height: 800px;
   width: 100%;
 }
+
 </style>

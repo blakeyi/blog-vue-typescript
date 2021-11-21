@@ -1,19 +1,19 @@
 <template>
-  <div class="main">
+  <div class="aritcleCreate">
     <div class="top">
       <div class="left">
         <router-link to="/articles">
-          <i class="el-icon-arrow-left"></i>
-          <el-button style="padding: 3px 0"> 文章管理</el-button>
+          <i class="el-icon-arrow-left" style="color: #409eff"></i>
+          <el-button type="text" style="padding: 5px"> 文章管理</el-button>
         </router-link>
         <el-input
-          v-model="state.title"
+          v-model="title"
           placeholder="请输入文章标题"
           style="width: 35%"
         />
       </div>
       <div class="right">
-        <el-button type="info" icon="el-icon-plus" @click="handleSave" round
+        <el-button icon="el-icon-save" @click="handleSave" round
           >保存草稿</el-button
         >
         <el-button
@@ -27,23 +27,72 @@
     </div>
     <div class="body">
       <v-md-editor
-        v-model="state.markContent"
+        v-model="markContent"
         height="700px"
         style="margin-top: 40px"
       ></v-md-editor>
     </div>
-  </div>
-<el-dialog v-model="dialogFormVisible" title="Shipping address" :append-to-body="true">
-    <h1>11111</h1>
-    <!-- <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false"
-          >Confirm</el-button
+
+    <el-dialog
+      v-model="dialogFormVisible"
+      title="发布文章"
+      :append-to-body="true"
+    >
+      <div>
+        <label style="margin-right: 5px; vertical-align: top">文章标题:</label>
+        <el-input
+          v-model="title"
+          size="mini"
+          placeholder="请输入内容"
+          style="width: 280px; margin-right: 5px"
+        ></el-input>
+      </div>
+      <div class="articleTags">
+        <label style="margin-right: 5px">文章标签:</label>
+        <span
+          v-for="(item, index) in tags.labels"
+          :key="index"
+          style="padding: 3px"
         >
-      </span>
-    </template> -->
-  </el-dialog>
+          <span> {{ item }}</span>
+          <i
+            class="el-icon-circle-close"
+            style="color: red"
+            @click="handleDelLabel(label, index)"
+          ></i>
+        </span>
+        <el-input
+          v-model="tags.input"
+          size="mini"
+          style="width: 80px; margin-right: 5px"
+        ></el-input>
+        <el-button
+          type="primary"
+          size="small"
+          icon="el-icon-plus"
+          @click="handleAddLabel(tags.input)"
+          >增加</el-button
+        >
+      </div>
+      <div>
+        <label style="margin-right: 5px; vertical-align: top">文章描述:</label>
+        <el-input
+          v-model="desc"
+          type="textarea"
+          :rows="2"
+          placeholder="请输入内容"
+          style="width: 280px; margin-right: 5px"
+        ></el-input>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">取消</el-button>
+          <el-button @click="handleSave()">保存为草稿</el-button>
+          <el-button type="primary" @click="handleAdd()">发布文章</el-button>
+        </span>
+      </template>
+    </el-dialog>
+  </div>
 </template>
 
 
@@ -115,95 +164,104 @@ export default defineComponent({
   },
   data() {
     return {
-      gridData: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-      ],
-      dialogTableVisible: false,
       dialogFormVisible: false,
-      form: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: "",
+      tags: {
+        input: "",
+        labels: [],
       },
-      formLabelWidth: "120px",
-    };
-  },
-  setup() {
-    const state = reactive({
+      tag_input: "",
+      desc: "",
       title: "",
       markContent: "",
-    });
-    function handleSave() {
-      console.log("handleSave");
-    }
-
-    const handleAdd = async (): Promise<void> => {
-      console.log("handleAdd");
-      console.log(state.title);
-      console.log(state.markContent);
+    };
+  },
+  methods: {
+    handleDelLabel(label: String, index: Number) {
+      console.log(label, index);
+      let temp = new Array();
+      this.tags.labels.forEach((element: any, key: Number) => {
+        if (key != index) {
+          temp.push(element);
+        }
+      });
+      console.log(temp);
+      this.tags.labels = temp;
+    },
+    handleAddLabel(label: any) {
+      let exist = false;
+      this.tags.labels.forEach((element: String) => {
+        if (label == element) {
+          exist = true;
+        }
+      });
+      if (exist) {
+        this.$message.error("请勿添加重复标签");
+        return;
+      }
+      this.tags.labels.push(label);
+      console.log(label);
+    },
+    handleSave() {},
+    handleAdd() {
+      this.dialogFormVisible = false;
+      const loading = this.$loading({
+        lock: true,
+        text: "正在发布文章",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
       var date = new Date();
       var newData = {
-        title: state.title,
+        title: this.title,
         author: "blakeyi",
-        desc: "MongoDB 是一个 Nosql 数据库",
+        desc: this.desc,
         meta: {
           views: 0,
           comments: 0,
           likes: 0,
         },
-        tags: ["mongodb", "database", "NoSQL"],
+        tags: this.tags.labels,
         comments: [],
         likeusers: [],
         createtime: date.getTime().toString(),
         updatetime: date.getTime().toString(),
-        content: Base64.encode(state.markContent),
+        content: Base64.encode(this.markContent),
       };
       console.log(newData);
-
+      var that = this;
       axios
         .post("http://blakeyi.cn/articleCreate", newData)
-        .then(function (response) {
-          console.log(response);
+        .then((response: Object) => {
+          console.log(that);
+
+          if (response.data.ret_code == 0) {
+            console.log(response.data);
+            this.$notify.success({
+              title: "成功",
+              message: "文章发布成功",
+              type: "success",
+            });
+          } else {
+            that.$notify.error({
+              type: "success",
+              title: "提示",
+              message: "文章发布失败",
+            });
+          }
         })
         .catch(function (error) {
           alert(error);
+        })
+        .finally(function () {
+          loading.close();
         });
-    };
-
-    return {
-      state,
-      handleSave,
-      handleAdd,
-    };
+    },
   },
+  setup() {},
 });
 </script>
 <style lang="less" scoped>
-.main {
+.aritcleCreate {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -224,8 +282,17 @@ export default defineComponent({
   display: flex;
   justify-content: flex-end;
 }
-.el-dialog{
-  background-color: white;
+
+.left {
+  display: flex;
+  margin-left: 10px;
+}
+
+.articleTags {
+  padding: 3px;
+  height: 60px;
+  margin-right: 5px;
+  margin-top: 5px;
 }
 </style>
 

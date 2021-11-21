@@ -8,24 +8,15 @@
         :key="l._id"
         style="margin-bottom: 20px"
       >
-        <a
-          :href="l.url"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a :href="l.url" target="_blank" rel="noopener noreferrer">
           <el-card shadow="hover">
-            <img
-              :src="l.img"
-              class="image"
-            >
-            <div style="padding: 14px;">
-              <h4>{{l.title}}</h4>
-              <div class="content">{{l.content}}</div>
+            <img src="../assets/user.png" class="image" />
+            <div style="padding: 14px">
+              <h4>{{ l.title }}</h4>
+              <div class="content">{{ l.content }}</div>
+              <span> {{ formatTime(l.start_time) }}-- </span>
               <span>
-                {{formatTime(l.start_time)}}--
-              </span>
-              <span>
-                {{formatTime(l.end_time)}}
+                {{ formatTime(l.end_time) }}
               </span>
             </div>
           </el-card>
@@ -69,7 +60,7 @@ export default defineComponent({
         keyword: "",
         pageNum: 1,
         pageSize: 10,
-      } as Params
+      } as Params,
     });
 
     const formatTime = (value: string | Date): string => {
@@ -78,13 +69,24 @@ export default defineComponent({
 
     const handleSearch = async (): Promise<void> => {
       state.isLoading = true;
-      const data: ProjectsData = await service.get(urls.getProjectList, {
-        params: state.params,
-      });
+      // const data: ProjectsData = await service.get(urls.getProjectList, {
+      //   params: state.params,
+      // });
       state.isLoading = false;
-
-      state.list = [...state.list, ...data.list];
-      state.total = data.count;
+      let fakeData:object = {
+        count: 1,
+        list: [{
+          content: "123",
+          end_time: "123",
+          img: "assets/logo.png",
+          start_time: "123",
+          title: "123",
+          url: "123",
+          id: "123",
+        },
+      ]}
+      state.list = [...state.list, ...fakeData.list];
+      state.total = fakeData.count;
       state.params.pageNum++;
       if (state.total === state.list.length) {
         state.isLoadEnd = true;
@@ -108,7 +110,7 @@ export default defineComponent({
       formatTime,
       handleSearch,
     };
-  }
+  },
 });
 </script>
 <style lang="less" scoped>
@@ -123,8 +125,8 @@ export default defineComponent({
     text-overflow: ellipsis;
   }
   .image {
-    width: 100%;
-    height: 250px;
+    width: 50px;
+    height: 50px;
   }
 }
 </style>

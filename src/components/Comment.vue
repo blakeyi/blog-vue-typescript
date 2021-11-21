@@ -133,7 +133,7 @@ export default defineComponent({
       state.content = "";
       context.emit("ok", false);
       ElMessage({
-        message: "操作成功",
+        message: "登录成功",
         type: "success",
       });
     };

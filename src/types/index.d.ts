@@ -23,7 +23,7 @@ export interface LoginParams {
   password: string;
 }
 export interface UserInfo {
-  id: string;
+  _id: string;
   name: string;
   avatar: string | any;
 }
@@ -122,7 +122,7 @@ export interface ArticleDetailParams {
   type: number;
 }
 export interface LikeParams {
-  id: string;
+  _id: string;
   user_id: string;
 }
 

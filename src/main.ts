@@ -25,9 +25,10 @@ import {
     ElCard,
     ElTag,
     ElIcon,
-    ElCollapseTransition
+    ElCollapseTransition,
+    ElNotification 
 } from 'element-plus';
-
+import 'element-plus/lib/theme-chalk/index.css'
 const app = createApp(App)
 // app.mixin(mixin);
 
@@ -52,6 +53,7 @@ app.component(ElIcon.name, ElIcon);
 app.component(ElCollapseTransition.name, ElCollapseTransition);
 
 app.config.globalProperties.$message = ElMessage;
+app.config.globalProperties.$notify = ElNotification;
 app.config.globalProperties.$loading = ElLoading.service;
 // app.config.globalProperties.productionTip = false;
 app.config.globalProperties.$https = service;

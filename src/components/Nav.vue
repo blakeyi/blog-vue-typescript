@@ -1,18 +1,11 @@
 <template>
   <div>
-    <div
-      v-if="!state.isMobile"
-      class="nav"
-    >
+    <div v-if="!state.isMobile" class="nav">
       <div class="nav-content">
         <el-row :gutter="20">
           <el-col :span="3">
             <router-link to="/">
-              <img
-                class="logo"
-                src="../assets/logo.jpg"
-                alt="BiaoChenXuYing"
-              >
+              <img class="logo" src="../assets/logo.jpg" alt="BiaoChenXuYing" />
             </router-link>
           </el-col>
           <el-col :span="16">
@@ -30,61 +23,57 @@
                 v-for="l in state.list"
                 :key="l.index"
               >
-                {{l.name}}
+                {{ l.name }}
               </el-menuItem>
             </el-menu>
           </el-col>
-          <el-col
-            v-if="userInfo._id"
-            :span="5"
+          <el-col v-if="userInfo._id" :span="5">
+          <el-dropdown
+            class="avatar-container right-menu-item hover-effect"
+            trigger="click"
           >
-            <div class="nav-right">
-              <el-dropdown @command="handleLogout">
-                <span class="el-dropdown-link">
-                  {{userInfo.name}}<i class="el-icon-arrow-down el-icon--right"></i>
-                </span>
-                <img
-                  v-if="!userInfo.avatar"
-                  class="user-img"
-                  src="../assets/user.png"
-                  alt="BiaoChenXuYing"
-                >
-                <img
-                  v-if="userInfo.avatar"
-                  class="user-img"
-                  :src="userInfo.avatar"
-                  alt="BiaoChenXuYing"
-                >
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item command="logout">登 出</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
+            <div class="avatar-wrapper">
+              <img src="../assets/user.png" class="user-avatar" />
+              <i class="el-icon-caret-bottom" />
             </div>
+            <template v-slot:dropdown>
+              <el-dropdown-menu>
+                <router-link to="/about">
+                  <el-dropdown-item>个人信息</el-dropdown-item>
+                </router-link>
+                <a
+                  target="_blank"
+                  href="https://github.com/PanJiaChen/vue-element-admin/"
+                >
+                  <el-dropdown-item>Github</el-dropdown-item>
+                </a>
+                <el-dropdown-item divided @click="handleLogout()">
+                  <span style="display: block">退出登录</span>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
           </el-col>
-          <el-col
-            v-else
-            :span="4"
-          >
+          <el-col v-else :span="4">
             <div class="nav-right">
               <el-button
                 size="small"
                 type="primary"
                 @click="handleClick('login')"
-              >登录</el-button>
+                >登录</el-button
+              >
               <el-button
                 size="small"
                 type="danger"
                 @click="handleClick('register')"
-              >注册</el-button>
+                >注册</el-button
+              >
             </div>
           </el-col>
         </el-row>
       </div>
     </div>
-    <div
-      v-else
-      class="nav"
-    >
+    <div v-else class="nav">
       <div class="nav-mobile">
         <div class="nav-mobile-logo">
           <router-link to="/">
@@ -92,67 +81,43 @@
               class="logo fl"
               src="../assets/logo.jpg"
               alt="BiaoChenXuYing"
-            >
+            />
           </router-link>
         </div>
-        <div class="title">{{state.title}}</div>
-        <div
-          class="menu"
-          @click="handleMenu"
-        ><i class="el-icon-menu"></i></div>
+        <div class="title">{{ state.title }}</div>
+        <div class="menu" @click="handleMenu"><i class="el-icon-menu"></i></div>
       </div>
       <div
         v-if="state.isShow"
         class="nav-mobile-content"
-        :class="{'enter-slideUp': state.enterSlideUp,'leave-slideDown': state.leaveSlideDown}"
+        :class="{
+          'enter-slideUp': state.enterSlideUp,
+          'leave-slideDown': state.leaveSlideDown,
+        }"
       >
         <div class="list">
-          <div
-            @click="handleClickMenu('')"
-            class="item"
-          >
+          <div @click="handleClickMenu('')" class="item">
             <router-link to="/">首 页</router-link>
           </div>
-          <div
-            @click="handleClickMenu('/articles')"
-            class="item"
-          >
+          <div @click="handleClickMenu('/articles')" class="item">
             <router-link to="/articles">文 章</router-link>
           </div>
-          <div
-            @click="handleClickMenu('/archive')"
-            class="item"
-          >
+          <div @click="handleClickMenu('/archive')" class="item">
             <router-link to="/archive">归 档</router-link>
           </div>
-          <div
-            @click="handleClickMenu('/project')"
-            class="item"
-          >
+          <div @click="handleClickMenu('/project')" class="item">
             <router-link to="/project">项 目</router-link>
           </div>
-          <div
-            @click="handleClickMenu('/timeline')"
-            class="item"
-          >
+          <div @click="handleClickMenu('/timeline')" class="item">
             <router-link to="/timeline">历 程</router-link>
           </div>
-          <div
-            @click="handleClickMenu('/message')"
-            class="item"
-          >
+          <div @click="handleClickMenu('/message')" class="item">
             <router-link to="/message">留 言</router-link>
           </div>
-          <div
-            @click="handleClickMenu('/about')"
-            class="item"
-          >
+          <div @click="handleClickMenu('/about')" class="item">
             <router-link to="/about">关 于</router-link>
           </div>
-          <div
-            @click="handleClickMenu('/login')"
-            class="item"
-          >
+          <div @click="handleClickMenu('/login')" class="item">
             <span v-if="userInfo._id">{{ userInfo.name }}</span>
             <span v-else>登 录</span>
           </div>
@@ -176,7 +141,7 @@
     <div
       v-if="state.isShow"
       class="mask"
-      :class="{'mask-fade-out': state.leaveSlideDown}"
+      :class="{ 'mask-fade-out': state.leaveSlideDown }"
       @click="handleHideMenu"
     ></div>
     <RegisterAndLogin
@@ -190,11 +155,7 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  defineAsyncComponent,
-  reactive,
-} from "vue";
+import { defineComponent, defineAsyncComponent, reactive } from "vue";
 import service from "../utils/https";
 import urls from "../utils/urls";
 import { useStore } from "vuex";
@@ -218,15 +179,18 @@ export default defineComponent({
         name: "",
         avatar: "",
       };
+      console.log(window.sessionStorage.userInfo)
       if (window.sessionStorage.userInfo) {
         userInfo = JSON.parse(window.sessionStorage.userInfo);
         (this as any).$store.commit("SAVE_USER", {
           userInfo,
         });
       }
+      console.log(userInfo)
       if ((this as any).$store.state.user.userInfo) {
         userInfo = (this as any).$store.state.user.userInfo;
       }
+      console.log(userInfo)
       return userInfo;
     },
   },
@@ -313,6 +277,7 @@ export default defineComponent({
     };
 
     const handleOk = (value: boolean): void => {
+      console.log("handleOk")
       state.visible = value;
     };
 
@@ -337,6 +302,7 @@ export default defineComponent({
     };
 
     const handleClickMenu = (route?: string): void => {
+      console.log("handleClickMenu", route)
       state.isShow = false;
       if (route === "/login") {
         state.handleFlag = "login";
@@ -380,7 +346,7 @@ export default defineComponent({
       });
       window.sessionStorage.userInfo = JSON.stringify(userInfo);
       ElMessage({
-        message: "操作成功",
+        message: "登录成功",
         type: "success",
       });
       let preventHistory = JSON.parse(window.sessionStorage.preventHistory);
@@ -412,7 +378,7 @@ export default defineComponent({
       getUser,
       handleSelect,
       routeChange,
-      handleHideMenu
+      handleHideMenu,
     };
   },
 });
@@ -492,7 +458,7 @@ export default defineComponent({
     }
     .user-img {
       position: absolute;
-      top: -15px;
+      top: 5px;
       right: 0;
       width: 50px;
       border-radius: 50%;
@@ -559,6 +525,30 @@ export default defineComponent({
   }
   to {
     opacity: 0;
+  }
+}
+
+.avatar-container {
+  margin-right: 30px;
+
+  .avatar-wrapper {
+    margin-top: 5px;
+    position: relative;
+
+    .user-avatar {
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+    }
+
+    .el-icon-caret-bottom {
+      cursor: pointer;
+      position: absolute;
+      right: -20px;
+      top: 25px;
+      font-size: 12px;
+    }
   }
 }
 </style>

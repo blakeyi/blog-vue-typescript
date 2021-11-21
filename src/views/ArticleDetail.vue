@@ -41,18 +41,29 @@
               </span>
               <span>
                 <el-button
-                  type="small"
+                  type="text"
                   :loading="state.btnLoading"
                   @click="changeModel()"
+                  style="color: #969696; font-size: 12px"
                   >编辑</el-button
                 >
               </span>
               <span>
                 <el-button
-                  type="small"
+                  type="text"
                   :loading="state.btnLoading"
                   @click="republish()"
+                  style="color: #969696; font-size: 12px"
                   >重新发布</el-button
+                >
+              </span>
+              <span>
+                <el-button
+                  type="text"
+                  :loading="state.btnLoading"
+                  @click="handleDelArticle()"
+                  style="color: red; font-size: 12px"
+                  >删除</el-button
                 >
               </span>
             </div>
@@ -79,11 +90,12 @@
         <el-button
           type="danger"
           size="large"
-          icon="heart"
+          icon="el-icon-star-on"
           :loading="state.isLoading"
           @click="likeArticle"
         >
-          点赞
+          <span v-if="state.likeTimes == 0" > 点赞</span>
+          <span v-if="state.likeTimes > 0" > 取消点赞</span>
         </el-button>
       </div>
       <div class="comment">
@@ -104,7 +116,7 @@
         v-if="!state.isLoading"
         :numbers="state.articleDetail.meta.comments"
         :list="state.articleDetail.comments"
-        :article_id="state.articleDetail.id"
+        :article_id="state.articleDetail._id"
         @refreshArticle="refreshArticle"
       />
     </div>
@@ -194,6 +206,43 @@ export default defineComponent({
       console.log(this.editting);
       this.editting = !this.editting;
     },
+    handleDelArticle() {
+      console.log(this.state.articleDetail);
+      const loading = this.$loading({
+        lock: true,
+        text: "正在删除文章",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
+      let data = {
+        _id: this.state.articleDetail._id,
+      };
+      axios
+        .post("http://blakeyi.cn/articleDelete", data)
+        .then((response: Object) => {
+          if (response.data.ret_code == 0) {
+            console.log(response.data);
+            this.$notify.success({
+              title: "成功",
+              message: "文章删除成功",
+              type: "success",
+            });
+            this.$router.push("/articles");
+          } else {
+            this.$notify.error({
+              type: "success",
+              title: "提示",
+              message: "文章删除失败",
+            });
+          }
+        })
+        .catch(function (error) {
+          alert(error);
+        })
+        .finally(function () {
+          loading.close();
+        });
+    },
   },
   setup() {
     let text = ref(2);
@@ -210,7 +259,7 @@ export default defineComponent({
       } as ArticleDetailParams,
       content: "",
       articleDetail: {
-        id: "",
+        _id: "",
         title: "第一篇文章",
         author: "blakeyi",
         desc: "",
@@ -239,6 +288,7 @@ export default defineComponent({
         .post("http://blakeyi.cn/articleQuery", queryData)
         .then(function (response) {
           console.log(response);
+          console.log(state.isLoading);
           state.articleDetail = response.data.ret_content;
           state.markContent = Base64.decode(response.data.ret_content.content);
         })
@@ -252,7 +302,7 @@ export default defineComponent({
     };
 
     const likeArticle = async (): Promise<void> => {
-      if (!state.articleDetail.id) {
+      if (!state.articleDetail._id) {
         ElMessage({
           message: "该文章不存在！",
           type: "warning",
@@ -271,7 +321,7 @@ export default defineComponent({
       let user_id: string = "";
       if (window.sessionStorage.userInfo) {
         let userInfo = JSON.parse(window.sessionStorage.userInfo);
-        user_id = userInfo.id;
+        user_id = userInfo.name;
       } else {
         ElMessage({
           message: "登录才能点赞，请先登录！",
@@ -279,19 +329,32 @@ export default defineComponent({
         });
         return;
       }
+      console.log(window.sessionStorage.userInfo);
+      console.log(user_id);
       let params: LikeParams = {
-        id: state.articleDetail.id,
-        user_id,
+        _id: state.articleDetail._id,
+        likeusers: [user_id],
+        operation: "add",
       };
-      await service.post(urls.likeArticle, params);
-      state.isLoading = false;
+      axios
+        .post("http://blakeyi.cn/articleUpdate", params)
+        .then((response: Object) => {
+          console.log(response);
+          state.btnLoading = false;
+        })
+        .catch(function (error) {
+          alert(error);
+        })
+        .finally(function () {
+          state.isLoading = false;
 
-      state.likeTimes++;
-      ++state.articleDetail.meta.likes;
-      ElMessage({
-        message: "操作成功",
-        type: "success",
-      });
+          state.likeTimes++;
+          ++state.articleDetail.meta.likes;
+          ElMessage({
+            message: "操作成功",
+            type: "success",
+          });
+        });
     };
 
     const handleAddComment = async (): Promise<void> => {
