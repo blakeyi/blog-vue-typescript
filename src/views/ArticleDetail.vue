@@ -481,10 +481,10 @@ export default defineComponent({
     };
   },
   beforeUnmount(): void {
-    document.title = "夜尽天明的博客网站";
+    document.title = "月清浅微凉的博客网站";
     document
       .getElementById("keywords")
-      .setAttribute("content", "夜尽天明 的博客网站");
+      .setAttribute("content", "月清浅微凉 的博客网站");
     document
       .getElementById("description")
       .setAttribute(
