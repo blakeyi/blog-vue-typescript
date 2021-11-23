@@ -94,8 +94,8 @@
           :loading="state.isLoading"
           @click="likeArticle"
         >
-          <span v-if="state.likeTimes == 0" > 点赞</span>
-          <span v-if="state.likeTimes > 0" > 取消点赞</span>
+          <span v-if="state.likeTimes == 0"> 点赞</span>
+          <span v-if="state.likeTimes > 0"> 取消点赞</span>
         </el-button>
       </div>
       <div class="comment">
@@ -358,7 +358,7 @@ export default defineComponent({
     };
 
     const handleAddComment = async (): Promise<void> => {
-      if (!state.articleDetail.id) {
+      if (!state.articleDetail._id) {
         ElMessage({
           message: "该文章不存在！",
           type: "error",
@@ -391,10 +391,9 @@ export default defineComponent({
         });
         return;
       }
-      let user_id = "";
+      let userInfo = "";
       if (window.sessionStorage.userInfo) {
-        let userInfo = JSON.parse(window.sessionStorage.userInfo);
-        user_id = userInfo.id;
+        userInfo = JSON.parse(window.sessionStorage.userInfo);
       } else {
         ElMessage({
           message: "登录才能评论，请先登录！",
@@ -402,13 +401,26 @@ export default defineComponent({
         });
         return;
       }
-
+      console.log(userInfo);
       state.btnLoading = true;
-      await service.post(urls.addComment, {
-        article_id: state.articleDetail.id,
-        user_id,
+      let data = {
+        operation:"add",
+        _id: state.articleDetail._id,
+        comments:[{
+          user: {
+          name: userInfo.name,
+          type: userInfo.name == "blakeyi" ? 0 : 1,
+        },
+        createtime: nowTime.toString(),
         content: state.content,
-      });
+        othercomments: [],
+        }]
+        
+      };
+      console.log(data);
+
+
+      await service.post("http://49.234.20.133:3333/articleUpdate", data);
       state.btnLoading = false;
       state.times++;
       state.cacheTime = nowTime;

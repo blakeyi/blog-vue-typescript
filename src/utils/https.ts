@@ -44,9 +44,10 @@ service.interceptors.response.use(
     // code == 0: success
     if (res.status === 200) {
       const data: ResponseData = res.data
-      if (data.code === 0) {
+      if (data.ret_code === 0) {
         return data.data;
       } else {
+        console.log(data);
         ElMessage({
           message: data.message,
           type: "error"

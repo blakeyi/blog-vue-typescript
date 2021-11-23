@@ -2,13 +2,9 @@
 <template>
   <div class="comment-list">
     <div class="top-title">
-      <span>{{numbers}} 条评论</span>
+      <span>{{ numbers }} 条评论</span>
     </div>
-    <div
-      v-for="item in list"
-      :key="item._id"
-      class="item"
-    >
+    <div v-for="item in list" :key="item._id" class="item">
       <div class="item-header">
         <div class="author">
           <div class="avatar">
@@ -16,38 +12,36 @@
               v-if="item.user.avatar.length < 10"
               src="../assets/user.png"
               alt="默认图片"
-            >
-            <img
-              v-else
-              :src="item.user.avatar"
-              alt=""
-            >
+            />
+            <img v-else :src="item.user.avatar" alt="" />
           </div>
         </div>
         <div class="info">
           <div class="name">
-            {{item.user.name}}
-            {{item.user.type === 0 ? '(作者)' : ''}}
+            {{ item.user.name }}
+            {{ item.user.type === 0 ? "(作者)" : "" }}
           </div>
           <div class="time">
-            {{formatTime(item.createtime)}}
+            {{ formatTime(item.createtime) }}
           </div>
         </div>
       </div>
-      <div class="comment-detail">{{item.content}}</div>
+      <div class="comment-detail">{{ item.content }}</div>
       <div class="item-comment">
-        <div
-          @click="showCommentModal(item._id, item.user)"
-          class="message"
-        >
-          <el-button size="small">回复</el-button>
+        <div class="message">
+          <el-button size="small" @click="showCommentModal(item._id, item.user)"
+            >回复</el-button
+          >
+          <el-button
+            size="small"
+            type="danger"
+            class="showBtn"
+            @click="delFirCommentDlg(item._id)"
+            >删除</el-button
+          >
         </div>
       </div>
-      <div
-        v-for="e in item.othercomments"
-        :key="e._id"
-        class="item-other"
-      >
+      <div v-for="e in item.othercomments" :key="e._id" class="item-other">
         <div class="item-header">
           <div class="author">
             <div class="avatar">
@@ -55,34 +49,38 @@
                 v-if="e.user.avatar.length < 10"
                 src="../assets/user.png"
                 alt="默认图片"
-              >
-              <img
-                v-else
-                :src="e.user.avatar"
-                alt=""
-              >
+              />
+              <img v-else :src="e.user.avatar" alt="" />
             </div>
           </div>
           <div class="info">
             <div class="name">
-              {{e.user.name}}
-              {{e.user.type === 0 ? '(作者)' : ''}}
+              {{ e.user.name }}
+              {{ e.user.type === 0 ? "(作者)" : "" }}
             </div>
             <div class="time">
-              {{formatTime(e.createtime)}}
+              {{ formatTime(e.createtime) }}
             </div>
           </div>
         </div>
         <div class="comment-detail">
-          {{'@' + e.touser.name}}
-          {{e.touser.type === 0 ? '(作者)' : ''}}：{{e.content}}
+          {{ "@" + e.touser.name }}
+          {{ e.touser.type === 0 ? "(作者)" : "" }}：{{ e.content }}
         </div>
         <div class="item-comment">
           <div class="message">
             <el-button
               @click="showCommentModal(item._id, item.user, e.user)"
               size="small"
-            >回复</el-button>
+              >回复</el-button
+            >
+            <el-button
+              size="small"
+              type="danger"
+              class="showBtn"
+              @click="delSecCommentDlg(item._id, e._id)"
+              >删除</el-button
+            >
           </div>
         </div>
       </div>
@@ -96,13 +94,20 @@
       @cancel="handleCancel"
     />
   </div>
+  <!-- <el-dialog title="提示" :visible.sync="delCommentDlg" width="30%">
+      <span>{{ verifyMsg }}</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="delCommentDlg = false">取 消</el-button>
+        <el-button type="primary" @click="handleVerifyConfirm">确 定</el-button>
+      </span>
+    </el-dialog> -->
 </template>
 <script lang="ts">
 import { ElMessage } from "element-plus";
 import { defineComponent, defineAsyncComponent, reactive } from "vue";
 import { timestampToTime } from "../utils/utils";
 import { ToUser } from "../types/index";
-
+import service from "../utils/https";
 export default defineComponent({
   name: "CommentList",
   components: {
@@ -131,7 +136,7 @@ export default defineComponent({
         name: "",
         avatar: "",
         type: 0,
-      }
+      },
     });
 
     const formatTime = (value: string | Date): string => {
@@ -172,13 +177,51 @@ export default defineComponent({
         state.to_user = user;
       }
     };
+    const delFirCommentDlg = async (commitId: string): Promise<void> => {
+      console.log(commitId);
+            let data = {
+        operation: "del",
+        _id: props.article_id,
+        comments: [
+          {
+            _id: commitId,
+          },
+        ],
+      };
+      console.log(data);
 
+      await service.post("http://49.234.20.133:3333/articleUpdate", data);
+    };
+    const delSecCommentDlg = async (commitId: string, otherId: string): Promise<void> => {
+      console.log(commitId);
+      console.log(otherId);
+      let data = {
+        operation: "del",
+        _id: props.article_id,
+        comments: [
+          {
+            _id: commitId,
+            othercomments: [
+              {
+                _id: otherId,
+              },
+            ],
+          },
+        ],
+      };
+      console.log(data);
+
+      await service.post("http://49.234.20.133:3333/articleUpdate", data);
+
+    };
     return {
       state,
       showCommentModal,
       handleOk,
       handleCancel,
       formatTime,
+      delFirCommentDlg,
+      delSecCommentDlg,
     };
   },
 });
@@ -302,6 +345,13 @@ export default defineComponent({
   .message {
     padding: 10px;
   }
+}
+
+.showBtn {
+  display: none;
+}
+.message:hover button {
+  display: inline-block;
 }
 </style>
 

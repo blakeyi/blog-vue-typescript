@@ -36,7 +36,7 @@ export default defineConfig({
   // outDir: 'dist',
   server: {
     // hostname: '0.0.0.0',
-    host: "localhost",
+    host: "0.0.0.0",
     port: 3001,
     // // 是否自动在浏览器打开
     // open: true,

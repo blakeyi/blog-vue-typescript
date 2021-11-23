@@ -15,18 +15,9 @@
         ></el-input>
       </el-form-item>
     </el-form>
-    <div
-      slot="footer"
-      class="dialog-footer"
-    >
-      <el-button
-        type="default"
-        @click="cancel"
-      >取消</el-button>
-      <el-button
-        type="primary"
-        @click="handleOk"
-      >确 定</el-button>
+    <div slot="footer" class="dialog-footer">
+      <el-button type="default" @click="cancel">取消</el-button>
+      <el-button type="primary" @click="handleOk">确 定</el-button>
     </div>
   </el-dialog>
 </template>
@@ -107,10 +98,9 @@ export default defineComponent({
         return;
       }
 
-      let user_id = "";
+      let userInfo = "";
       if (window.sessionStorage.userInfo) {
-        let userInfo = JSON.parse(window.sessionStorage.userInfo);
-        user_id = userInfo._id;
+        userInfo = JSON.parse(window.sessionStorage.userInfo);
       } else {
         ElMessage({
           message: "登录才能评论，请先登录！",
@@ -119,23 +109,44 @@ export default defineComponent({
         return;
       }
       state.btnLoading = true;
-      await service.post(urls.addThirdComment, {
-        article_id: props.article_id,
-        user_id,
-        comment_id: props.comment_id,
-        to_user: JSON.stringify(props.to_user),
-        content: state.content,
-      });
+      let data = {
+        operation: "add",
+        _id: props.article_id,
+        comments: [
+          {
+            _id: props.comment_id,
+            user: {
+              name: "blakeyi",
+              type: 0,
+            },
+            createtime: "",
+            content: "",
+            othercomments: [
+              {
+                _id: "",
+                user: {
+                  name: userInfo.name,
+                  type: userInfo.name == "blakeyi" ? 0 : 1,
+                },
+                createtime: nowTime.toString(),
+                content: state.content,
+                touser: {
+                  name: props.to_user.name,
+                  type: props.to_user.name == "blakeyi" ? 0 : 1,
+                },
+              },
+            ],
+          },
+        ],
+      };
+      console.log(data);
+      await service.post("http://49.234.20.133:3333/articleUpdate", data);
       state.btnLoading = false;
       state.times++;
 
       state.cacheTime = nowTime;
       state.content = "";
       context.emit("ok", false);
-      ElMessage({
-        message: "登录成功",
-        type: "success",
-      });
     };
 
     watch(props, (val, oldVal) => {

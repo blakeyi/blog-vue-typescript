@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="登录"
+    :title="handleFlag === 'register' ? '注册' : '登录'"
     :width="isMobile ? '90%' : '50%'"
     v-model="state.dialogDodel"
     @close="cancel"
@@ -20,6 +20,18 @@
           type="password"
           placeholder="密码"
           v-model="state.params.password"
+          autocomplete="off"
+        ></el-input>
+      </el-formItem>
+      <el-formItem
+        label="确认密码"
+        :label-width="state.formLabelWidth"
+        v-if="handleFlag === 'register'"
+      >
+        <el-input
+          type="password"
+          placeholder="密码"
+          v-model="state.password_confirm"
           autocomplete="off"
         ></el-input>
       </el-formItem>
@@ -111,7 +123,8 @@ export default defineComponent({
       dialogDodel: props.visible,
       btnLoading: false,
       loading: false,
-      formLabelWidth: props.isMobile ? "40px" : "60px",
+      formLabelWidth: props.isMobile ? "60px" : "80px",
+      password_confirm: "",
       params: {
         email: "",
         name: "",
@@ -138,25 +151,23 @@ export default defineComponent({
       state.btnLoading = true;
       if (props.handleFlag === "register") {
         axios
-          .post("http://blakeyi.cn/userLogin", state.params)
+          .post("http://blakeyi.cn/userRegister", state.params)
           .then((response: Object) => {
             console.log(response);
             state.btnLoading = false;
-
-            const userInfo: UserInfo = {
-              _id: data._id,
-              name: data.name,
-              avatar: data.avatar,
-            };
-            store.commit("SAVE_USER", {
-              userInfo,
-            });
-            window.sessionStorage.userInfo = JSON.stringify(userInfo);
+            if (response.data.ret_code == 0) {
+              ElMessage({
+                message: "注册成功",
+                type: "success",
+              });
+            } else {
+              ElMessage({
+                message: response.data.ret_content,
+                type: "error",
+              });
+              return
+            }
             context.emit("ok", false);
-            ElMessage({
-              message: "登录成功",
-              type: "success",
-            });
           })
           .catch(function (error) {
             alert(error);
@@ -168,7 +179,20 @@ export default defineComponent({
           .then((response: Object) => {
             console.log(response);
             state.btnLoading = false;
-
+            if (response.data.ret_code == 0) {
+              ElMessage({
+                message: "登录成功",
+                type: "success",
+              });
+            } else {
+              console.log(11111);
+              
+              ElMessage({
+                message: response.data.ret_content,
+                type: "error",
+              });
+              return
+            }
             const userInfo: UserInfo = {
               _id: response.data.ret_content._id,
               name: response.data.ret_content.name,
@@ -177,13 +201,9 @@ export default defineComponent({
             store.commit("SAVE_USER", {
               userInfo,
             });
-            console.log(window.sessionStorage.userInfo)
+            console.log(window.sessionStorage.userInfo);
             window.sessionStorage.userInfo = JSON.stringify(userInfo);
             context.emit("ok", false);
-            ElMessage({
-              message: "登录成功",
-              type: "success",
-            });
           })
           .catch(function (error) {
             alert(error);
@@ -193,7 +213,7 @@ export default defineComponent({
     };
 
     const handleOk = (): void => {
-      console.log(handleOk)
+      console.log(handleOk);
       const reg = new RegExp(
         "^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"
       ); //正则表达式
@@ -211,9 +231,15 @@ export default defineComponent({
         return;
       }
       if (props.handleFlag === "register") {
-        if (!state.params.password) {
+        if (!state.params.password || !state.password_confirm) {
           ElMessage({
             message: "密码不能为空！",
+            type: "warning",
+          });
+          return;
+        } else if (state.params.password !== state.password_confirm) {
+          ElMessage({
+            message: "两次密码输入不一致！",
             type: "warning",
           });
           return;
