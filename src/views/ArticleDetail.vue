@@ -41,6 +41,7 @@
               </span>
               <span>
                 <el-button
+                  v-show="state.curUser == 'blakeyi'"
                   type="text"
                   :loading="state.btnLoading"
                   @click="changeModel()"
@@ -50,6 +51,7 @@
               </span>
               <span>
                 <el-button
+                  v-show="state.curUser == 'blakeyi'"
                   type="text"
                   :loading="state.btnLoading"
                   @click="republish()"
@@ -59,6 +61,7 @@
               </span>
               <span>
                 <el-button
+                  v-show="state.curUser == 'blakeyi'"
                   type="text"
                   :loading="state.btnLoading"
                   @click="handleDelArticle()"
@@ -191,6 +194,7 @@ declare let document: Document | any;
 
 export default defineComponent({
   name: "ArticleDetail",
+  inject: ["reload"],
   components: {
     LoadingCustom,
     CommentList,
@@ -253,6 +257,7 @@ export default defineComponent({
       markContent: "",
       markContentEdit: "", // 编辑框内容
       isMobileOrPc: isMobileOrPc(),
+      curUser: "", // 当前用户，没登录为空
       params: {
         id: "",
         type: 1, //文章类型 => 1: 普通文章，2: 简历，3: 管理员介绍
@@ -263,13 +268,14 @@ export default defineComponent({
         title: "第一篇文章",
         author: "blakeyi",
         desc: "",
-        meta: { views: 1, likes: 1, comments: 1 },
+        meta: { views: 0, likes: 0, comments: 0 },
         tags: [],
         comments: [],
         likeusers: [],
         createtime: "",
         updatetime: "",
         content: "",
+        numbers: 0,
       },
       cacheTime: 0, // 缓存时间
       times: 0, // 评论次数
@@ -291,6 +297,8 @@ export default defineComponent({
           console.log(state.isLoading);
           state.articleDetail = response.data.ret_content;
           state.markContent = Base64.decode(response.data.ret_content.content);
+          state.articleDetail.numbers = state.markContent.length;
+          state.likeTimes = response.data.ret_content.meta.likes;
         })
         .catch(function (error) {
           alert(error);
@@ -331,13 +339,25 @@ export default defineComponent({
       }
       console.log(window.sessionStorage.userInfo);
       console.log(user_id);
-      let params: LikeParams = {
+      let params = {
         _id: state.articleDetail._id,
         likeusers: [user_id],
         operation: "add",
       };
       axios
         .post("http://blakeyi.cn/articleUpdate", params)
+        .then((response: Object) => {
+          console.log(response);
+        });
+      let params1 = {
+        _id: state.articleDetail._id,
+        meta: {
+          likes: 1,
+        },
+        operation: "add",
+      };
+      axios
+        .post("http://blakeyi.cn/articleUpdate", params1)
         .then((response: Object) => {
           console.log(response);
           state.btnLoading = false;
@@ -358,6 +378,7 @@ export default defineComponent({
     };
 
     const handleAddComment = async (): Promise<void> => {
+      console.log(state.articleDetail);
       if (!state.articleDetail._id) {
         ElMessage({
           message: "该文章不存在！",
@@ -404,23 +425,32 @@ export default defineComponent({
       console.log(userInfo);
       state.btnLoading = true;
       let data = {
-        operation:"add",
+        operation: "add",
         _id: state.articleDetail._id,
-        comments:[{
-          user: {
-          name: userInfo.name,
-          type: userInfo.name == "blakeyi" ? 0 : 1,
-        },
-        createtime: nowTime.toString(),
-        content: state.content,
-        othercomments: [],
-        }]
-        
+        comments: [
+          {
+            user: {
+              name: userInfo.name,
+              type: userInfo.name == "blakeyi" ? 0 : 1,
+            },
+            createtime: nowTime.toString(),
+            content: state.content,
+            othercomments: [],
+          },
+        ],
       };
       console.log(data);
 
-
       await service.post("http://49.234.20.133:3333/articleUpdate", data);
+
+      let data1 = {
+        _id: state.articleDetail._id,
+        meta: {
+          comments: 1,
+        },
+        operation: "add",
+      };
+      await service.post("http://49.234.20.133:3333/articleUpdate", data1);
       state.btnLoading = false;
       state.times++;
       state.cacheTime = nowTime;
@@ -439,6 +469,10 @@ export default defineComponent({
         state.params.type = 3;
       }
       handleSearch();
+      if (window.sessionStorage.userInfo) {
+        let userInfo = JSON.parse(window.sessionStorage.userInfo);
+        state.curUser = userInfo.name;
+      }
     });
 
     const Model = ref(1);

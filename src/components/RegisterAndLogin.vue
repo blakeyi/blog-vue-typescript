@@ -90,7 +90,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, watch } from "vue";
+import { defineComponent, reactive, watch, inject } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
@@ -118,6 +118,7 @@ export default defineComponent({
   },
   emits: ["ok", "cancel"],
   setup(props, context) {
+    const reload = inject("reload");
     const store = useStore(key);
     const state = reactive({
       dialogDodel: props.visible,
@@ -165,7 +166,7 @@ export default defineComponent({
                 message: response.data.ret_content,
                 type: "error",
               });
-              return
+              return;
             }
             context.emit("ok", false);
           })
@@ -184,14 +185,15 @@ export default defineComponent({
                 message: "登录成功",
                 type: "success",
               });
+              reload()
             } else {
               console.log(11111);
-              
+
               ElMessage({
                 message: response.data.ret_content,
                 type: "error",
               });
-              return
+              return;
             }
             const userInfo: UserInfo = {
               _id: response.data.ret_content._id,

@@ -33,6 +33,7 @@
             >回复</el-button
           >
           <el-button
+            v-show="item.user.name == state.curUser"
             size="small"
             type="danger"
             class="showBtn"
@@ -75,6 +76,7 @@
               >回复</el-button
             >
             <el-button
+              v-show="item.user.name == state.curUser"
               size="small"
               type="danger"
               class="showBtn"
@@ -104,7 +106,13 @@
 </template>
 <script lang="ts">
 import { ElMessage } from "element-plus";
-import { defineComponent, defineAsyncComponent, reactive } from "vue";
+import {
+  defineComponent,
+  defineAsyncComponent,
+  reactive,
+  onMounted,
+  inject,
+} from "vue";
 import { timestampToTime } from "../utils/utils";
 import { ToUser } from "../types/index";
 import service from "../utils/https";
@@ -131,6 +139,7 @@ export default defineComponent({
     const state = reactive({
       visible: false,
       comment_id: "",
+      curUser: "", // 当前用户
       to_user: {
         user_id: "",
         name: "",
@@ -138,7 +147,7 @@ export default defineComponent({
         type: 0,
       },
     });
-
+    const reload = inject("reload");
     const formatTime = (value: string | Date): string => {
       return timestampToTime(value, true);
     };
@@ -151,7 +160,12 @@ export default defineComponent({
       state.visible = false;
       context.emit("refreshArticle");
     };
-
+    onMounted(() => {
+      if (window.sessionStorage.userInfo) {
+        let userInfo = JSON.parse(window.sessionStorage.userInfo);
+        state.curUser = userInfo.name;
+      }
+    });
     // 添加评论
     const showCommentModal = (
       commitId: string,
@@ -160,7 +174,7 @@ export default defineComponent({
     ): boolean | void => {
       if (!window.sessionStorage.userInfo) {
         ElMessage({
-          message: "登录才能点赞，请先登录！",
+          message: "登录才能评论，请先登录！",
           type: "warning",
         });
         return false;
@@ -179,7 +193,7 @@ export default defineComponent({
     };
     const delFirCommentDlg = async (commitId: string): Promise<void> => {
       console.log(commitId);
-            let data = {
+      let data = {
         operation: "del",
         _id: props.article_id,
         comments: [
@@ -189,10 +203,21 @@ export default defineComponent({
         ],
       };
       console.log(data);
-
-      await service.post("http://49.234.20.133:3333/articleUpdate", data);
+      let params1 = {
+        _id: props.article_id,
+        meta: {
+          comments: 1,
+        },
+        operation: "del",
+      };
+      service.post("http://49.234.20.133:3333/articleUpdate", data);
+      service.post("http://49.234.20.133:3333/articleUpdate", params1);
+      reload();
     };
-    const delSecCommentDlg = async (commitId: string, otherId: string): Promise<void> => {
+    const delSecCommentDlg = async (
+      commitId: string,
+      otherId: string
+    ): Promise<void> => {
       console.log(commitId);
       console.log(otherId);
       let data = {
@@ -210,9 +235,16 @@ export default defineComponent({
         ],
       };
       console.log(data);
-
+      let params1 = {
+        _id: props.article_id,
+        meta: {
+          comments: 1,
+        },
+        operation: "del",
+      };
       await service.post("http://49.234.20.133:3333/articleUpdate", data);
-
+      await service.post("http://49.234.20.133:3333/articleUpdate", params1);
+      reload();
     };
     return {
       state,
@@ -222,6 +254,7 @@ export default defineComponent({
       formatTime,
       delFirCommentDlg,
       delSecCommentDlg,
+      reload,
     };
   },
 });

@@ -156,7 +156,7 @@ export default defineComponent({
     }
   }
   .tags {
-    min-height: 200px;
+    min-height: 50px;
     padding: 5px 0 20px 0;
     margin-bottom: 10px;
     border-bottom: 1px solid #eee;

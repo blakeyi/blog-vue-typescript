@@ -1,20 +1,26 @@
 <template>
   <div class="left clearfix">
-    <h3 v-if="state.params.tag_id">
-      {{ state.tag_name }} 相关的文章
-    </h3>
-    <el-input
-      v-model="state.searchInput"
-      placeholder="关键字"
-      prefix-icon="el-icon-search"
-      style="width: 50%; margin-right:10px"
-    >
-    </el-input>
-    <el-button type="primary" icon="el-icon-search" >搜索文章</el-button>
-    <router-link to="/articleCreate">
-      <el-button type="success" icon="el-icon-plus">新增文章</el-button>
-    </router-link>
+    <h3 v-if="state.params.tag_id">{{ state.tag_name }} 相关的文章</h3>
 
+    <el-row :gutter="20">
+      <el-col :span="8">
+        <el-input
+          v-model="state.searchInput"
+          placeholder="关键字"
+          prefix-icon="el-icon-search"
+          style="margin-right: 10px"
+        >
+        </el-input>
+      </el-col>
+      <el-col :span="8">
+        <el-button type="primary" icon="el-icon-search">搜索文章</el-button>
+      </el-col>
+      <el-col :span="8" v-show="state.curUser == 'blakeyi'">
+        <router-link to="/articleCreate">
+          <el-button type="success" icon="el-icon-plus">新增文章</el-button>
+        </router-link>
+      </el-col>
+    </el-row>
     <ul class="articles-list" id="list">
       <transition-group name="el-fade-in">
         <li
@@ -116,6 +122,7 @@ export default defineComponent({
       searchInput: "",
       articlesList: [] as Array<any>,
       total: 0,
+      curUser: "", // 当前用户
       tag_name: decodeURI(getQueryStringByName("tag_name")),
       params: {
         keyword: "",
@@ -148,6 +155,7 @@ export default defineComponent({
       axios
         .post("http://blakeyi.cn/articleList", data)
         .then(function (response) {
+          console.log(response);
           state.isLoading = false;
           state.articlesList = response.data.ret_content.list;
           state.total = response.data.ret_content.count;
@@ -167,16 +175,23 @@ export default defineComponent({
       state.params.category_id = getQueryStringByName("category_id");
       state.articlesList = [];
       state.params.pageNum = 1;
-      handleSearch();
+      console.log("routeChange");
+      //handleSearch();
     };
 
     onMounted(() => {
+      console.log("onMounted");
       handleSearch();
+      if (window.sessionStorage.userInfo) {
+        let userInfo = JSON.parse(window.sessionStorage.userInfo);
+        state.curUser = userInfo.name;
+      }
       window.onscroll = () => {
         if (getScrollTop() + getWindowHeight() > getDocumentHeight() - 100) {
           // 如果不是已经没有数据了，都可以继续滚动加载
           if (state.isLoadEnd === false && state.isLoading === false) {
             handleSearch();
+            console.log("onMounted1");
           }
         }
       };
@@ -200,6 +215,7 @@ export default defineComponent({
     margin: 0;
     padding: 0;
     list-style: none;
+    height: 65vh;
     .title {
       color: #333;
       margin: 7px 0 4px;

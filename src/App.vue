@@ -2,7 +2,7 @@
   <div class="container">
     <Nav v-if="state.isShowNav" />
     <div class="layout">
-      <router-view />
+      <router-view v-if="state.isRouterAlive" />
       <CustomSlider v-if="state.isShowSlider"></CustomSlider>
     </div>
     <ArrowUp v-if="state.isShowNav"></ArrowUp>
@@ -11,8 +11,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, defineAsyncComponent, reactive, onMounted } from "vue";
-import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router';
+import {
+  defineComponent,
+  defineAsyncComponent,
+  reactive,
+  onMounted,
+  provide,
+  nextTick,
+} from "vue";
+import { useRouter, useRoute, onBeforeRouteUpdate } from "vue-router";
 import { isMobileOrPc } from "./utils/utils";
 
 // 移动端 rem 单位适配
@@ -39,15 +46,25 @@ export default defineComponent({
       this.routeChange(val, oldVal);
     },
   },
+  method: {},
+  data() {
+    return {};
+  },
   setup() {
     const state = reactive({
       isShowNav: false,
       isShowSlider: false,
+      isRouterAlive: true,
     });
-
     // const router = useRouter();
     const route = useRoute();
-
+    const reload = () => {
+      state.isRouterAlive = false;
+      nextTick(function () {
+        state.isRouterAlive = true;
+      });
+    };
+    provide("reload", reload);
     const routeChange = (val: any, oldVal: any): void => {
       const referrer: any = document.getElementById("referrer");
       if (val.path === "/") {
@@ -77,8 +94,8 @@ export default defineComponent({
     };
 
     onMounted(() => {
-        routeChange(route, route);
-    })
+      routeChange(route, route);
+    });
 
     // onBeforeRouteUpdate((to: any, from: any) => {
     //     console.log(to, "=====");
@@ -89,6 +106,7 @@ export default defineComponent({
     return {
       state,
       routeChange,
+      reload,
     };
   },
 });
@@ -118,5 +136,4 @@ img {
   // height: 800px;
   width: 100%;
 }
-
 </style>

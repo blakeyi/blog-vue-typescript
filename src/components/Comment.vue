@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import { ElMessage } from "element-plus";
-import { defineComponent, reactive, watch } from "vue";
+import { defineComponent, reactive, watch, inject } from "vue";
 import service from "../utils/https";
 import urls from "../utils/urls";
 
@@ -57,7 +57,7 @@ export default defineComponent({
       cacheTime: 0, // 缓存时间
       times: 0, // 留言次数
     });
-
+    const reload = inject("reload")
     const cancel = (): boolean => {
       context.emit("cancel", false);
       return false;
@@ -141,11 +141,21 @@ export default defineComponent({
       };
       console.log(data);
       await service.post("http://49.234.20.133:3333/articleUpdate", data);
+
+      let data1 = {
+        _id: props.article_id,
+        meta: {
+          comments: 1,
+        },
+        operation: "add",
+      };
+      await service.post("http://49.234.20.133:3333/articleUpdate", data1);
       state.btnLoading = false;
       state.times++;
 
       state.cacheTime = nowTime;
       state.content = "";
+      reload()
       context.emit("ok", false);
     };
 

@@ -241,6 +241,7 @@ export default defineComponent({
               message: "文章发布成功",
               type: "success",
             });
+            this.$router.push("/articles");
           } else {
             that.$notify.error({
               type: "success",

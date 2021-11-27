@@ -28,31 +28,31 @@
             </el-menu>
           </el-col>
           <el-col v-if="userInfo._id" :span="5">
-          <el-dropdown
-            class="avatar-container right-menu-item hover-effect"
-            trigger="click"
-          >
-            <div class="avatar-wrapper">
-              <img src="../assets/user.png" class="user-avatar" />
-              <i class="el-icon-caret-bottom" />
-            </div>
-            <template v-slot:dropdown>
-              <el-dropdown-menu>
-                <router-link to="/about">
-                  <el-dropdown-item>个人信息</el-dropdown-item>
-                </router-link>
-                <a
-                  target="_blank"
-                  href="https://github.com/PanJiaChen/vue-element-admin/"
-                >
-                  <el-dropdown-item>Github</el-dropdown-item>
-                </a>
-                <el-dropdown-item divided @click="handleLogout()">
-                  <span style="display: block">退出登录</span>
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+            <el-dropdown
+              class="avatar-container right-menu-item hover-effect"
+              trigger="click"
+            >
+              <div class="avatar-wrapper">
+                <img src="../assets/user.png" class="user-avatar" />
+                <i class="el-icon-caret-bottom" />
+              </div>
+              <template v-slot:dropdown>
+                <el-dropdown-menu>
+                  <router-link to="/about">
+                    <el-dropdown-item>个人信息</el-dropdown-item>
+                  </router-link>
+                  <a
+                    target="_blank"
+                    href="https://github.com/PanJiaChen/vue-element-admin/"
+                  >
+                    <el-dropdown-item>Github</el-dropdown-item>
+                  </a>
+                  <el-dropdown-item divided @click="handleLogout()">
+                    <span style="display: block">退出登录</span>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </el-col>
           <el-col v-else :span="4">
             <div class="nav-right">
@@ -155,7 +155,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, defineAsyncComponent, reactive } from "vue";
+import { defineComponent, defineAsyncComponent, reactive, inject } from "vue";
 import service from "../utils/https";
 import urls from "../utils/urls";
 import { useStore } from "vuex";
@@ -179,18 +179,18 @@ export default defineComponent({
         name: "",
         avatar: "",
       };
-      console.log(window.sessionStorage.userInfo)
+      console.log(window.sessionStorage.userInfo);
       if (window.sessionStorage.userInfo) {
         userInfo = JSON.parse(window.sessionStorage.userInfo);
         (this as any).$store.commit("SAVE_USER", {
           userInfo,
         });
       }
-      console.log(userInfo)
+      console.log(userInfo);
       if ((this as any).$store.state.user.userInfo) {
         userInfo = (this as any).$store.state.user.userInfo;
       }
-      console.log(userInfo)
+      console.log(userInfo);
       return userInfo;
     },
   },
@@ -213,6 +213,7 @@ export default defineComponent({
   setup(props, context) {
     const store = useStore(key);
     const router = useRouter();
+    const reload = inject("reload");
     const state = reactive({
       visible: false,
       handleFlag: "",
@@ -277,7 +278,7 @@ export default defineComponent({
     };
 
     const handleOk = (value: boolean): void => {
-      console.log("handleOk")
+      console.log("handleOk");
       state.visible = value;
     };
 
@@ -299,10 +300,11 @@ export default defineComponent({
           avatar: "",
         },
       });
+      reload()
     };
 
     const handleClickMenu = (route?: string): void => {
-      console.log("handleClickMenu", route)
+      console.log("handleClickMenu", route);
       state.isShow = false;
       if (route === "/login") {
         state.handleFlag = "login";
@@ -335,7 +337,7 @@ export default defineComponent({
         { withCredentials: true }
       );
       loading.close();
-
+      console.log(data);
       const userInfo: UserInfo = {
         _id: data._id,
         name: data.name,
