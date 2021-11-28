@@ -1,7 +1,7 @@
 <template>
   <div class="left clearfix">
+    <!-- 功能栏 -->
     <h3 v-if="state.params.tag_id">{{ state.tag_name }} 相关的文章</h3>
-
     <el-row :gutter="20">
       <el-col :span="8">
         <el-input
@@ -13,7 +13,7 @@
         </el-input>
       </el-col>
       <el-col :span="8">
-        <el-button type="primary" icon="el-icon-search">搜索文章</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="filterArticle">搜索文章</el-button>
       </el-col>
       <el-col :span="8" v-show="state.curUser == 'blakeyi'">
         <router-link to="/articleCreate">
@@ -24,7 +24,7 @@
     <ul class="articles-list" id="list">
       <transition-group name="el-fade-in">
         <li
-          v-for="article in state.articlesList"
+          v-for="article in state.filterList"
           :key="article._id"
           class="item"
         >
@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, onMounted, nextTick } from "vue";
+import { defineComponent, reactive, onMounted, nextTick, watch } from "vue";
 import service from "../utils/https";
 import urls from "../utils/urls";
 import LoadEnd from "../components/LoadEnd.vue";
@@ -108,21 +108,15 @@ export default defineComponent({
       immediate: true,
     },
   },
-  data() {
-    return {
-      searchInput: "11",
-      articlesList: [],
-    };
-  },
-
   setup(props, context) {
     const state = reactive({
-      isLoadEnd: false,
-      isLoading: false,
-      searchInput: "",
+      isLoadEnd: false as Boolean,
+      isLoading: false as Boolean,
+      searchInput: "" as String,
       articlesList: [] as Array<any>,
-      total: 0,
-      curUser: "", // 当前用户
+      filterList:[] as Array<any>, // 用于过滤文章
+      total: 0 as Number,
+      curUser: "" as String, // 当前用户
       tag_name: decodeURI(getQueryStringByName("tag_name")),
       params: {
         keyword: "",
@@ -146,7 +140,18 @@ export default defineComponent({
     const formatTime = (value: string | Date): string => {
       return timestampToTime(value, true);
     };
+    // 过滤文章
+    const filterArticle = () => {
+        console.log(state.searchInput)
+        state.filterList = new Array()
+        for (let article of state.articlesList) {
+          console.log(article.title.search(state.searchInput))
 
+            if (article.title.search(state.searchInput) > -1) {
+              state.filterList.push(article)
+            }
+        }
+    }
     const handleSearch = async (): Promise<void> => {
       var data = {
         page_num: 1,
@@ -158,6 +163,7 @@ export default defineComponent({
           console.log(response);
           state.isLoading = false;
           state.articlesList = response.data.ret_content.list;
+          state.filterList = response.data.ret_content.list;
           state.total = response.data.ret_content.count;
           state.params.pageNum++;
           nextTick(() => {
@@ -168,12 +174,12 @@ export default defineComponent({
           alert(error);
         });
     };
-
     const routeChange = (val: any, oldVal: any): void => {
       state.tag_name = decodeURI(getQueryStringByName("tag_name"));
       state.params.tag_id = getQueryStringByName("tag_id");
       state.params.category_id = getQueryStringByName("category_id");
       state.articlesList = [];
+      state.filterList = [];
       state.params.pageNum = 1;
       console.log("routeChange");
       //handleSearch();
@@ -203,6 +209,7 @@ export default defineComponent({
       formatTime,
       handleSearch,
       routeChange,
+      filterArticle
     };
   },
 });

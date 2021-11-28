@@ -1116,7 +1116,7 @@ export default defineComponent({
       }
 
       function renderPostProcess() {
-        gl.enable(gl.TEXTURE_2D);
+        //gl.enable(gl.TEXTURE_2D);
         gl.disable(gl.DEPTH_TEST);
         var bindRT: any = function (rt: any, isclear: any) {
           gl.bindFramebuffer(gl.FRAMEBUFFER, rt.frameBuffer);

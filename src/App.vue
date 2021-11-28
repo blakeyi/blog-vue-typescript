@@ -6,7 +6,6 @@
       <CustomSlider v-if="state.isShowSlider"></CustomSlider>
     </div>
     <ArrowUp v-if="state.isShowNav"></ArrowUp>
-    <!-- <Footer v-if="isShowNav"></Footer> -->
   </div>
 </template>
 
@@ -38,17 +37,13 @@ export default defineComponent({
     CustomSlider: defineAsyncComponent(
       () => import("./components/CustomSlider.vue")
     ),
-    Footer: defineAsyncComponent(() => import("./components/Footer.vue")),
     ArrowUp: defineAsyncComponent(() => import("./components/Footer.vue")),
   },
   watch: {
-    $route: function (val: any, oldVal: any) {
-      this.routeChange(val, oldVal);
+    $route: function (newVal: any, oldVal: any) {
+      console.log(newVal, oldVal)
+      this.routeChange(newVal, oldVal);
     },
-  },
-  method: {},
-  data() {
-    return {};
   },
   setup() {
     const state = reactive({
@@ -76,7 +71,6 @@ export default defineComponent({
       }
       const navs = [
         "/articles",
-        "/archive",
         "/archive",
         "/project",
         "/timeline",
