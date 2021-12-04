@@ -230,7 +230,7 @@ export default defineComponent({
       console.log(newData);
       var that = this;
       axios
-        .post("http://blakeyi.cn/articleCreate", newData)
+        .post("https://blakeyi.cn/articleCreate", newData)
         .then((response: Object) => {
           console.log(that);
 

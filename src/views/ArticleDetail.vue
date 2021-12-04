@@ -222,7 +222,7 @@ export default defineComponent({
         _id: this.state.articleDetail._id,
       };
       axios
-        .post("http://blakeyi.cn/articleDelete", data)
+        .post("https://blakeyi.cn/articleDelete", data)
         .then((response: Object) => {
           if (response.data.ret_code == 0) {
             console.log(response.data);
@@ -291,7 +291,7 @@ export default defineComponent({
         _id: state.params.id,
       };
       axios
-        .post("http://blakeyi.cn/articleQuery", queryData)
+        .post("https://blakeyi.cn/articleQuery", queryData)
         .then(function (response) {
           console.log(response);
           console.log(state.isLoading);
@@ -345,7 +345,7 @@ export default defineComponent({
         operation: "add",
       };
       axios
-        .post("http://blakeyi.cn/articleUpdate", params)
+        .post("https://blakeyi.cn/articleUpdate", params)
         .then((response: Object) => {
           console.log(response);
         });
@@ -357,7 +357,7 @@ export default defineComponent({
         operation: "add",
       };
       axios
-        .post("http://blakeyi.cn/articleUpdate", params1)
+        .post("https://blakeyi.cn/articleUpdate", params1)
         .then((response: Object) => {
           console.log(response);
           state.btnLoading = false;
@@ -441,7 +441,7 @@ export default defineComponent({
       };
       console.log(data);
 
-      await service.post("http://49.234.20.133:3333/articleUpdate", data);
+      await service.post("https://49.234.20.133:3333/articleUpdate", data);
 
       let data1 = {
         _id: state.articleDetail._id,
@@ -450,7 +450,7 @@ export default defineComponent({
         },
         operation: "add",
       };
-      await service.post("http://49.234.20.133:3333/articleUpdate", data1);
+      await service.post("https://49.234.20.133:3333/articleUpdate", data1);
       state.btnLoading = false;
       state.times++;
       state.cacheTime = nowTime;
@@ -493,7 +493,7 @@ export default defineComponent({
         content: Base64.encode(state.markContentEdit),
       };
       axios
-        .post("http://blakeyi.cn/articleUpdate", updateData)
+        .post("https://blakeyi.cn/articleUpdate", updateData)
         .then(function (response) {
           console.log(response);
         })

@@ -129,12 +129,12 @@ export default defineComponent({
       } as ArticlesParams,
       href:
         import.meta.env.MODE === "development"
-          ? "http://localhost:3001/articleDetail?article_id="
-          : "http://blakeyi.cn/articleDetail?article_id=",
+          ? "https://localhost:3001/articleDetail?article_id="
+          : "https://blakeyi.cn/articleDetail?article_id=",
       href1:
         import.meta.env.MODE === "development"
-          ? "http://localhost:3001/articleCreate"
-          : "http://blakeyi.cn/articleCreate",
+          ? "https://localhost:3001/articleCreate"
+          : "https://blakeyi.cn/articleCreate",
     });
 
     const formatTime = (value: string | Date): string => {
@@ -158,7 +158,7 @@ export default defineComponent({
         page_size: 10,
       };
       axios
-        .post("http://blakeyi.cn/articleList", data)
+        .post("https://blakeyi.cn/articleList", data)
         .then(function (response) {
           console.log(response);
           state.isLoading = false;

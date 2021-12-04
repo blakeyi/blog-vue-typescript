@@ -152,7 +152,7 @@ export default defineComponent({
       state.btnLoading = true;
       if (props.handleFlag === "register") {
         axios
-          .post("http://blakeyi.cn/userRegister", state.params)
+          .post("https://blakeyi.cn/userRegister", state.params)
           .then((response: Object) => {
             console.log(response);
             state.btnLoading = false;
@@ -176,7 +176,7 @@ export default defineComponent({
           .finally(function () {});
       } else {
         axios
-          .post("http://blakeyi.cn/userLogin", state.params)
+          .post("https://blakeyi.cn/userLogin", state.params)
           .then((response: Object) => {
             console.log(response);
             state.btnLoading = false;
