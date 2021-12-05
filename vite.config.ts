@@ -29,6 +29,7 @@ export default defineConfig({
    * @default '/'
    */
   base: './',
+
   /**
   * 与“根”相关的目录，构建输出将放在其中。如果目录存在，它将在构建之前被删除。
   * @default 'dist'
@@ -36,8 +37,13 @@ export default defineConfig({
   // outDir: 'dist',
   server: {
     // hostname: '0.0.0.0',
-    host: "0.0.0.0",
-    port: 3001,
+    host: "localhost",
+    port:3001,
+    https: false,
+    hmr:{
+      protocol:'ws',
+      host:"localhost",
+    },
     // // 是否自动在浏览器打开
     // open: true,
     // // 是否开启 https
@@ -46,9 +52,9 @@ export default defineConfig({
     // ssr: false,
     proxy: {
       '/api': {
-        target: 'http://49.234.20.133:3333/',
+        target: 'https://49.234.20.133:3333/',
         changeOrigin: true,
-        ws: true,
+        // ws: false,
         rewrite: (pathStr) => pathStr.replace('/api', '')
       },
     },
