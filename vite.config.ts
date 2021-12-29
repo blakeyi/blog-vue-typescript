@@ -37,12 +37,11 @@ export default defineConfig({
   // outDir: 'dist',
   server: {
     // hostname: '0.0.0.0',
-    host: "localhost",
+    host: "0.0.0.0",
     port:3001,
-    https: false,
+    strictPort: true,
     hmr:{
-      protocol:'ws',
-      host:"localhost",
+      port:443
     },
     // // 是否自动在浏览器打开
     // open: true,
@@ -52,7 +51,7 @@ export default defineConfig({
     // ssr: false,
     proxy: {
       '/api': {
-        target: 'https://49.234.20.133:3333/',
+        target: 'https://blakeyi.cn/blog/',
         changeOrigin: true,
         // ws: false,
         rewrite: (pathStr) => pathStr.replace('/api', '')
