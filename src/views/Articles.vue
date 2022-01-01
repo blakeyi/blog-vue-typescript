@@ -13,7 +13,9 @@
         </el-input>
       </el-col>
       <el-col :span="8">
-        <el-button type="primary" icon="el-icon-search" @click="filterArticle">搜索文章</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="filterArticle"
+          >搜索文章</el-button
+        >
       </el-col>
       <el-col :span="8" v-show="state.curUser == 'blakeyi'">
         <router-link to="/articleCreate">
@@ -23,11 +25,7 @@
     </el-row>
     <ul class="articles-list" id="list">
       <transition-group name="el-fade-in">
-        <li
-          v-for="article in state.filterList"
-          :key="article._id"
-          class="item"
-        >
+        <li v-for="article in state.filterList" :key="article._id" class="item">
           <router-link :to="state.href + article._id">
             <div class="content">
               <h4 class="title">{{ article.title }}</h4>
@@ -114,7 +112,7 @@ export default defineComponent({
       isLoading: false as Boolean,
       searchInput: "" as String,
       articlesList: [] as Array<any>,
-      filterList:[] as Array<any>, // 用于过滤文章
+      filterList: [] as Array<any>, // 用于过滤文章
       total: 0 as Number,
       curUser: "" as String, // 当前用户
       tag_name: decodeURI(getQueryStringByName("tag_name")),
@@ -142,23 +140,24 @@ export default defineComponent({
     };
     // 过滤文章
     const filterArticle = () => {
-        console.log(state.searchInput)
-        state.filterList = new Array()
-        for (let article of state.articlesList) {
-          console.log(article.title.search(state.searchInput))
+      console.log(state.searchInput);
+      state.filterList = new Array();
+      for (let article of state.articlesList) {
+        console.log(article.title.search(state.searchInput));
 
-            if (article.title.search(state.searchInput) > -1) {
-              state.filterList.push(article)
-            }
+        if (article.title.search(state.searchInput) > -1) {
+          state.filterList.push(article);
         }
-    }
+      }
+    };
     const handleSearch = async (): Promise<void> => {
       var data = {
         page_num: 1,
         page_size: 10,
       };
+
       axios
-        .post("https://blakeyi.cn/articleList", data)
+        .post("https://blakeyi.cn/api/articleList", data)
         .then(function (response) {
           console.log(response);
           state.isLoading = false;
@@ -209,7 +208,7 @@ export default defineComponent({
       formatTime,
       handleSearch,
       routeChange,
-      filterArticle
+      filterArticle,
     };
   },
 });

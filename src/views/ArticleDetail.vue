@@ -222,7 +222,7 @@ export default defineComponent({
         _id: this.state.articleDetail._id,
       };
       axios
-        .post("https://blakeyi.cn/articleDelete", data)
+        .post("https://blakeyi.cn/api/articleDelete", data)
         .then((response: Object) => {
           if (response.data.ret_code == 0) {
             console.log(response.data);
@@ -291,7 +291,7 @@ export default defineComponent({
         _id: state.params.id,
       };
       axios
-        .post("https://blakeyi.cn/articleQuery", queryData)
+        .post("https://blakeyi.cn/api/articleQuery", queryData)
         .then(function (response) {
           console.log(response);
           console.log(state.isLoading);
@@ -345,7 +345,7 @@ export default defineComponent({
         operation: "add",
       };
       axios
-        .post("https://blakeyi.cn/articleUpdate", params)
+        .post("https://blakeyi.cn/api/articleUpdate", params)
         .then((response: Object) => {
           console.log(response);
         });
@@ -357,7 +357,7 @@ export default defineComponent({
         operation: "add",
       };
       axios
-        .post("https://blakeyi.cn/articleUpdate", params1)
+        .post("https://blakeyi.cn/api/articleUpdate", params1)
         .then((response: Object) => {
           console.log(response);
           state.btnLoading = false;
@@ -493,7 +493,7 @@ export default defineComponent({
         content: Base64.encode(state.markContentEdit),
       };
       axios
-        .post("https://blakeyi.cn/articleUpdate", updateData)
+        .post("https://blakeyi.cn/api/articleUpdate", updateData)
         .then(function (response) {
           console.log(response);
         })

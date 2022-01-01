@@ -51,7 +51,7 @@ export default defineConfig({
     // ssr: false,
     proxy: {
       '/api': {
-        target: 'https://blakeyi.cn/blog/',
+        target: 'https://blakeyi.cn/api',
         changeOrigin: true,
         // ws: false,
         rewrite: (pathStr) => pathStr.replace('/api', '')

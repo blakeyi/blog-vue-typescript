@@ -13,7 +13,7 @@
     "lib": ["esnext", "dom"],
     "types": ["vite/client"]
   },
-  "include": ["/src/**/*.ts", "/src/**/*.d.ts", "/src/**/*.tsx", "/src/**/*.vue"],
+  "include": ["/src/**/*.ts", "/src/**/*.d.ts", "/src/**/*.tsx", "/src/**/*.vue","types/**/*.d.ts","types/**/*.ts"],
   // ts 排除的文件
   "exclude": ["node_modules"]
 }
