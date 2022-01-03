@@ -13,12 +13,14 @@ export interface ResponseData {
 // 创建 axios 实例
 let service: AxiosInstance | any;
 if (import.meta.env.MODE === "development") {
+  console.log("development")
   service = axios.create({
     baseURL: "", // api 的 base_url
     timeout: 50000 // 请求超时时间
   });
 } else {
   // 生产环境下
+  console.log("product")
   service = axios.create({
     baseURL: "",
     timeout: 50000
@@ -43,16 +45,18 @@ service.interceptors.response.use(
     // Some example codes here:
     // code == 0: success
     if (res.status === 200) {
-      const data: ResponseData = res.data
-      if (data.ret_code === 0) {
-        return data.data;
-      } else {
-        console.log(data);
-        ElMessage({
-          message: data.message,
-          type: "error"
-        });
-      }
+      console.log(res)
+      return res.data
+      // const data: ResponseData = res.data
+      // if (data.ret_code === 0) {
+      //   return data.data;
+      // } else {
+      //   console.log(data);
+      //   ElMessage({
+      //     message: data.message,
+      //     type: "error"
+      //   });
+      // }
     } else {
       ElMessage({
         message: "网络错误!",

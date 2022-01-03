@@ -155,23 +155,17 @@ export default defineComponent({
         page_num: 1,
         page_size: 10,
       };
-
-      axios
-        .post("https://blakeyi.cn/api/articleList", data)
-        .then(function (response) {
-          console.log(response);
-          state.isLoading = false;
-          state.articlesList = response.data.ret_content.list;
-          state.filterList = response.data.ret_content.list;
-          state.total = response.data.ret_content.count;
-          state.params.pageNum++;
-          nextTick(() => {
-            lazyload();
-          });
-        })
-        .catch(function (error) {
-          alert(error);
-        });
+      state.isLoading = true;
+      const response: any = await service.get("/api/articleList", data);
+      console.log(response)
+      state.isLoading = false;
+      state.articlesList = response.ret_content.list;
+      state.filterList = response.ret_content.list;
+      state.total = response.ret_content.count;
+      state.params.pageNum++;
+      nextTick(() => {
+        lazyload();
+      });
     };
     const routeChange = (val: any, oldVal: any): void => {
       state.tag_name = decodeURI(getQueryStringByName("tag_name"));

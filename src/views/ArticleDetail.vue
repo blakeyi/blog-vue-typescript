@@ -153,7 +153,6 @@ import VMdEditor from "@kangc/v-md-editor/lib/codemirror-editor";
 import "@kangc/v-md-editor/lib/style/codemirror-editor.css";
 import githubTheme from "@kangc/v-md-editor/lib/theme/github.js";
 import "@kangc/v-md-editor/lib/theme/style/github.css";
-import axios from "axios";
 import { Base64 } from "js-base64";
 // highlightjs
 import hljs from "highlight.js";
@@ -210,7 +209,7 @@ export default defineComponent({
       console.log(this.editting);
       this.editting = !this.editting;
     },
-    handleDelArticle() {
+    async handleDelArticle() {
       console.log(this.state.articleDetail);
       const loading = this.$loading({
         lock: true,
@@ -221,31 +220,21 @@ export default defineComponent({
       let data = {
         _id: this.state.articleDetail._id,
       };
-      axios
-        .post("https://blakeyi.cn/api/articleDelete", data)
-        .then((response: Object) => {
-          if (response.data.ret_code == 0) {
-            console.log(response.data);
-            this.$notify.success({
-              title: "成功",
-              message: "文章删除成功",
-              type: "success",
-            });
-            this.$router.push("/articles");
-          } else {
-            this.$notify.error({
-              type: "success",
-              title: "提示",
-              message: "文章删除失败",
-            });
-          }
-        })
-        .catch(function (error) {
-          alert(error);
-        })
-        .finally(function () {
-          loading.close();
+      const response: any = await service.post("/api/articleDelete", data);
+      if (response.ret_code == 0) {
+        this.$notify.success({
+          title: "成功",
+          message: "文章删除成功",
+          type: "success",
         });
+        this.$router.push("/articles");
+      } else {
+        this.$notify.error({
+          type: "success",
+          title: "提示",
+          message: "文章删除失败",
+        });
+      }
     },
   },
   setup() {
@@ -290,19 +279,13 @@ export default defineComponent({
       var queryData = {
         _id: state.params.id,
       };
-      axios
-        .post("https://blakeyi.cn/api/articleQuery", queryData)
-        .then(function (response) {
-          console.log(response);
-          console.log(state.isLoading);
-          state.articleDetail = response.data.ret_content;
-          state.markContent = Base64.decode(response.data.ret_content.content);
-          state.articleDetail.numbers = state.markContent.length;
-          state.likeTimes = response.data.ret_content.meta.likes;
-        })
-        .catch(function (error) {
-          alert(error);
-        });
+      state.loading = true
+      const response: any = await service.post("/api/articleQuery", queryData);
+      state.articleDetail = response.ret_content;
+      state.markContent = Base64.decode(response.ret_content.content);
+      state.articleDetail.numbers = state.markContent.length;
+      state.likeTimes = response.ret_content.meta.likes;
+       state.loading = false
     };
 
     const refreshArticle = (): void => {
@@ -344,11 +327,7 @@ export default defineComponent({
         likeusers: [user_id],
         operation: "add",
       };
-      axios
-        .post("https://blakeyi.cn/api/articleUpdate", params)
-        .then((response: Object) => {
-          console.log(response);
-        });
+      await service.post("/api/articleUpdate", params)
       let params1 = {
         _id: state.articleDetail._id,
         meta: {
@@ -356,32 +335,14 @@ export default defineComponent({
         },
         operation: "add",
       };
-      axios
-        .post("https://blakeyi.cn/api/articleUpdate", params1)
-        .then((response: Object) => {
-          console.log(response);
-          state.btnLoading = false;
-        })
-        .catch(function (error) {
-          alert(error);
-        })
-        .finally(function () {
-          state.isLoading = false;
-
-          state.likeTimes++;
-          ++state.articleDetail.meta.likes;
-          ElMessage({
-            message: "操作成功",
-            type: "success",
-          });
-        });
+      await service.post("/api/articleUpdate", params1)
     };
 
     const handleAddComment = async (): Promise<void> => {
       console.log(state.articleDetail);
       if (!state.articleDetail._id) {
         ElMessage({
-          message: "该文章不存在！",
+          message: "该文章不存在",
           type: "error",
         });
         return;
@@ -389,7 +350,7 @@ export default defineComponent({
 
       if (state.times > 2) {
         ElMessage({
-          message: "您今天评论的次数已经用完，明天再来评论吧！",
+          message: "您今天评论的次数已经用完，明天再来评论吧",
           type: "warning",
         });
         return;
@@ -399,7 +360,7 @@ export default defineComponent({
       let nowTime = now.getTime();
       if (nowTime - state.cacheTime < 4000) {
         ElMessage({
-          message: "您评论太过频繁，1 分钟后再来留言吧！",
+          message: "您评论太过频繁，1 分钟后再来留言吧",
           type: "warning",
         });
         return;
@@ -417,7 +378,7 @@ export default defineComponent({
         userInfo = JSON.parse(window.sessionStorage.userInfo);
       } else {
         ElMessage({
-          message: "登录才能评论，请先登录！",
+          message: "登录才能评论，请先登录",
           type: "warning",
         });
         return;
@@ -441,7 +402,7 @@ export default defineComponent({
       };
       console.log(data);
 
-      await service.post("https://49.234.20.133:3333/articleUpdate", data);
+      await service.post("/api/articleUpdate", data);
 
       let data1 = {
         _id: state.articleDetail._id,
@@ -450,7 +411,7 @@ export default defineComponent({
         },
         operation: "add",
       };
-      await service.post("https://49.234.20.133:3333/articleUpdate", data1);
+      await service.post("/api/articleUpdate", data1);
       state.btnLoading = false;
       state.times++;
       state.cacheTime = nowTime;
@@ -484,7 +445,7 @@ export default defineComponent({
         Model.value = 1;
       }
     };
-    const republish = () => {
+    const republish = async () => {
       console.log(state.markContentEdit);
       state.markContent = state.markContentEdit;
       Model.value = 1;
@@ -492,14 +453,11 @@ export default defineComponent({
         _id: state.params.id,
         content: Base64.encode(state.markContentEdit),
       };
-      axios
-        .post("https://blakeyi.cn/api/articleUpdate", updateData)
-        .then(function (response) {
-          console.log(response);
-        })
-        .catch(function (error) {
-          alert(error);
-        });
+      const response: any = await service.post(
+        "/api/articleUpdate",
+        updateData
+      );
+      console.log(response);
     };
     return {
       state,

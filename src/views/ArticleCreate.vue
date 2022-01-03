@@ -119,7 +119,6 @@ import "@kangc/v-md-editor/lib/theme/style/github.css";
 
 // highlightjs
 import hljs from "highlight.js";
-import axios from "axios";
 import { Base64 } from "js-base64";
 // codemirror 编辑器的相关资源
 import Codemirror from "codemirror";
@@ -202,7 +201,7 @@ export default defineComponent({
       console.log(label);
     },
     handleSave() {},
-    handleAdd() {
+    async handleAdd() {
       this.dialogFormVisible = false;
       const loading = this.$loading({
         lock: true,
@@ -229,33 +228,21 @@ export default defineComponent({
       };
       console.log(newData);
       var that = this;
-      axios
-        .post("https://blakeyi.cn/api/articleCreate", newData)
-        .then((response: Object) => {
-          console.log(that);
-
-          if (response.data.ret_code == 0) {
-            console.log(response.data);
-            this.$notify.success({
-              title: "成功",
-              message: "文章发布成功",
-              type: "success",
-            });
-            this.$router.push("/articles");
-          } else {
-            that.$notify.error({
-              type: "success",
-              title: "提示",
-              message: "文章发布失败",
-            });
-          }
-        })
-        .catch(function (error) {
-          alert(error);
-        })
-        .finally(function () {
-          loading.close();
+      const response: any = await service.post("/api/articleCreate", newData);
+      if (response.ret_code == 0) {
+        this.$notify.success({
+          title: "成功",
+          message: "文章发布成功",
+          type: "success",
         });
+        this.$router.push("/articles");
+      } else {
+        that.$notify.error({
+          type: "success",
+          title: "提示",
+          message: "文章发布失败",
+        });
+      }
     },
   },
   setup() {},

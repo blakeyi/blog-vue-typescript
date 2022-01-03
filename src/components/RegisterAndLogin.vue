@@ -99,7 +99,6 @@ import config from "../utils/config";
 import { RegAndLogParams, UserInfo } from "../types/index";
 import service from "../utils/https";
 import urls from "../utils/urls";
-import axios from "axios";
 export default defineComponent({
   name: "RegisterAndLogin",
   props: {
@@ -148,69 +147,58 @@ export default defineComponent({
     };
 
     const submit = async (): Promise<void> => {
-      let data: any = "";
       state.btnLoading = true;
       if (props.handleFlag === "register") {
-        axios
-          .post("https://blakeyi.cn/userRegister", state.params)
-          .then((response: Object) => {
-            console.log(response);
-            state.btnLoading = false;
-            if (response.data.ret_code == 0) {
-              ElMessage({
-                message: "注册成功",
-                type: "success",
-              });
-            } else {
-              ElMessage({
-                message: response.data.ret_content,
-                type: "error",
-              });
-              return;
-            }
-            context.emit("ok", false);
-          })
-          .catch(function (error) {
-            alert(error);
-          })
-          .finally(function () {});
+        const response: any = await service.post(
+          "/api/userRegister",
+          state.params
+        );
+        state.btnLoading = false;
+        if (response.ret_code == 0) {
+          ElMessage({
+            message: "注册成功",
+            type: "success",
+          });
+        } else {
+          ElMessage({
+            message: response.ret_content,
+            type: "error",
+          });
+          return;
+        }
+        context.emit("ok", false);
       } else {
-        axios
-          .post("https://blakeyi.cn/userLogin", state.params)
-          .then((response: Object) => {
-            console.log(response);
-            state.btnLoading = false;
-            if (response.data.ret_code == 0) {
-              ElMessage({
-                message: "登录成功",
-                type: "success",
-              });
-              reload()
-            } else {
-              console.log(11111);
+        const response: any = await service.post(
+          "/api/userLogin",
+          state.params
+        );
+        state.btnLoading = false;
+        if (response.ret_code == 0) {
+          ElMessage({
+            message: "登录成功",
+            type: "success",
+          });
+          reload();
+        } else {
+          console.log(11111);
 
-              ElMessage({
-                message: response.data.ret_content,
-                type: "error",
-              });
-              return;
-            }
-            const userInfo: UserInfo = {
-              _id: response.data.ret_content._id,
-              name: response.data.ret_content.name,
-              avatar: response.data.ret_content.avatar,
-            };
-            store.commit("SAVE_USER", {
-              userInfo,
-            });
-            console.log(window.sessionStorage.userInfo);
-            window.sessionStorage.userInfo = JSON.stringify(userInfo);
-            context.emit("ok", false);
-          })
-          .catch(function (error) {
-            alert(error);
-          })
-          .finally(function () {});
+          ElMessage({
+            message: response.ret_content,
+            type: "error",
+          });
+          return;
+        }
+        const userInfo: UserInfo = {
+          _id: response.ret_content._id,
+          name: response.ret_content.name,
+          avatar: response.ret_content.avatar,
+        };
+        store.commit("SAVE_USER", {
+          userInfo,
+        });
+        console.log(window.sessionStorage.userInfo);
+        window.sessionStorage.userInfo = JSON.stringify(userInfo);
+        context.emit("ok", false);
       }
     };
 
